@@ -252,7 +252,7 @@ namespace VehicleBehaviour {
                 steering = turnInputCurve.Evaluate(GetInput(turnInput)) * steerAngle;
                 steering = randomSteering;
 
-                Debug.Log("steering " + steering);
+                //Debug.Log("steering " + steering);
                 // Dirft
                 drift = GetInput(driftInput) > 0 && _rb.velocity.sqrMagnitude > 100;
                 // Jump

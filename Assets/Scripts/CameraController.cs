@@ -16,6 +16,11 @@ public class CameraController : MonoBehaviour
     // Update is called once per frame
     void LateUpdate()
     {
-        transform.position = car.transform.position + offset;
+        transform.position = car.transform.position + new Vector3(0, 30, 0);
+    }
+
+    public void SetCar(GameObject newCar)
+    {
+        car = newCar;
     }
 }

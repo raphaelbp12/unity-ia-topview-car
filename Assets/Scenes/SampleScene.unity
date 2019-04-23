@@ -425,7 +425,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myPrefab: {fileID: 3818005974458165132, guid: 0115432ff31e1ef4f98cea6a11796f23,
     type: 3}
-  numCars: 10
+  camera: {fileID: 963194225}
+  numCars: 1
 --- !u!4 &900292624
 Transform:
   m_ObjectHideFlags: 0
