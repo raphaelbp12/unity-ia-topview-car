@@ -33,7 +33,10 @@ public class GameRulesController : MonoBehaviour
     void FixedUpdate()
     {
         WheelVehicle[] newCars = FindObjectsOfType<WheelVehicle>();
-        text.text = "goalDistance " + newCars[activeCarIndex].goalDistance.ToString();
+        if (activeCarIndex < newCars.Length)
+        {
+            text.text = "goalDistance " + newCars[activeCarIndex].goalDistance.ToString();
+        }
         SelectCarToCamera(newCars);
     }
 
