@@ -181,6 +181,9 @@ namespace VehicleBehaviour {
 
         private float randomThrottle;
         private float randomSteering;
+        private GameObject goal;
+        private bool goalReached = false;
+        public float goalDistance;
 
         // Init rigidbody, center of mass, wheels and more
         void Start() {
@@ -190,6 +193,8 @@ namespace VehicleBehaviour {
             if (boostClip != null) {
                 boostSource.clip = boostClip;
             }
+
+            goal = GameObject.FindGameObjectWithTag("Goal");
 
             randomThrottle = UnityEngine.Random.Range(-1.0f, 1.0f);
             randomSteering = UnityEngine.Random.Range(-25.0f, 25.0f);
@@ -212,6 +217,8 @@ namespace VehicleBehaviour {
             {
                 wheel.motorTorque = 0.0001f;
             }
+
+            goalDistance = 0.0f;
         }
 
         // Visual feedbacks and boost regen
@@ -228,6 +235,11 @@ namespace VehicleBehaviour {
                 boost += Time.deltaTime * boostRegen;
                 if (boost > maxBoost) { boost = maxBoost; }
             }
+        }
+
+        void LateUpdate()
+        {
+            goalDistance = Vector3.Distance(this.gameObject.transform.position, goal.transform.position);
         }
         
         // Update everything
@@ -385,7 +397,14 @@ namespace VehicleBehaviour {
                 Debug.Log("collide wall");
                 //other.gameObject.SetActive(false);
                 this.gameObject.SetActive(false);
-                Debug.Log("position: " + this.gameObject.transform.position.ToString());
+                //Debug.Log("position: " + this.gameObject.transform.position.ToString());
+            } else if (other.gameObject.CompareTag("Goal"))
+            {
+                Debug.Log("collide goal");
+                //other.gameObject.SetActive(false);
+                this.goalReached = true;
+                this.gameObject.SetActive(false);
+                //Debug.Log("position: " + this.gameObject.transform.position.ToString());
             }
             //Destroy(other.gameObject);
         }

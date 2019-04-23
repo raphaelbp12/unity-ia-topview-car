@@ -22,5 +22,6 @@ public class CameraController : MonoBehaviour
     public void SetCar(GameObject newCar)
     {
         car = newCar;
+        //Debug.Log("setCar called");
     }
 }

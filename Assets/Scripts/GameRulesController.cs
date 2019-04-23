@@ -1,12 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using VehicleBehaviour;
 
 public class GameRulesController : MonoBehaviour
 {
     // Reference to the Prefab. Drag a Prefab into this field in the Inspector.
     public GameObject myPrefab;
     public GameObject camera;
+    public Text text;
 
     public int numCars;
     private GameObject[] cars;
@@ -24,24 +27,34 @@ public class GameRulesController : MonoBehaviour
             cars[i] = car;
         }
         activeCarIndex = 0;
+        text.text = "goalDistance unset";
     }
 
     void FixedUpdate()
     {
-        if (cars.Length > 0)
+        WheelVehicle[] newCars = FindObjectsOfType<WheelVehicle>();
+        text.text = "goalDistance " + newCars[activeCarIndex].goalDistance.ToString();
+        SelectCarToCamera(newCars);
+    }
+
+    void SelectCarToCamera(WheelVehicle[] newCars)
+    {
+        if (newCars.Length > 0)
         {
-            if (!cars[activeCarIndex].activeInHierarchy)
+            if (!newCars[activeCarIndex].gameObject.activeInHierarchy)
             {
-                for (int i = 0; i < numCars; i++)
+                Debug.Log("newCars length " + newCars.Length);
+                for (int i = 0; i < newCars.Length; i++)
                 {
-                    if(cars[i].activeInHierarchy)
+                    var car = newCars[i];
+                    if (car.gameObject.activeInHierarchy)
                     {
                         activeCarIndex = i;
                     }
                 }
 
             }
-            camera.SendMessage("SetCar", cars[activeCarIndex]);
+            camera.SendMessage("SetCar", newCars[activeCarIndex].gameObject);
         }
     }
 }
