@@ -179,6 +179,9 @@ namespace VehicleBehaviour {
         Rigidbody _rb;
         WheelCollider[] wheels;
 
+        private float randomThrottle;
+        private float randomSteering;
+
         // Init rigidbody, center of mass, wheels and more
         void Start() {
 #if MULTIOSCONTROLS
@@ -188,7 +191,10 @@ namespace VehicleBehaviour {
                 boostSource.clip = boostClip;
             }
 
-		    boost = maxBoost;
+            randomThrottle = UnityEngine.Random.Range(-1.0f, 1.0f);
+            randomSteering = UnityEngine.Random.Range(-25.0f, 25.0f);
+
+            boost = maxBoost;
 
             _rb = GetComponent<Rigidbody>();
             spawnPosition = transform.position;
@@ -232,14 +238,21 @@ namespace VehicleBehaviour {
             // Get all the inputs!
             if (isPlayer) {
                 // Accelerate & brake
-                if (throttleInput != "" && throttleInput != null)
-                {
-                    throttle = GetInput(throttleInput) - GetInput(brakeInput);
-                }
+                //if (throttleInput != "" && throttleInput != null)
+                //{
+                //    throttle = GetInput(throttleInput) - GetInput(brakeInput);
+                //    Debug.Log("throttle " + throttle);
+                //}
+
+                throttle = randomThrottle;
+                //Debug.Log("throttle " + throttle);
                 // Boost
                 boosting = (GetInput(boostInput) > 0.5f);
                 // Turn
                 steering = turnInputCurve.Evaluate(GetInput(turnInput)) * steerAngle;
+                steering = randomSteering;
+
+                Debug.Log("steering " + steering);
                 // Dirft
                 drift = GetInput(driftInput) > 0 && _rb.velocity.sqrMagnitude > 100;
                 // Jump
@@ -363,6 +376,18 @@ namespace VehicleBehaviour {
 #else
         return Input.GetAxis(input);
 #endif
+        }
+
+        void OnTriggerEnter(Collider other)
+        {
+            if (other.gameObject.CompareTag("Wall"))
+            {
+                Debug.Log("collide wall");
+                //other.gameObject.SetActive(false);
+                this.gameObject.SetActive(false);
+                Debug.Log("position: " + this.gameObject.transform.position.ToString());
+            }
+            //Destroy(other.gameObject);
         }
     }
 }
