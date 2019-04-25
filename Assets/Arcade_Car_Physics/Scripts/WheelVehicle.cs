@@ -186,15 +186,17 @@ namespace VehicleBehaviour {
         private Vector3 lastPosition;
         private bool gameover = false;
 
+        public int ticks = 0;
         public int ticksOnCrash = 3000;
         public float distanceTravelled = 0.0f;
         public int maxLifeTimeSec = 25;
         public int minLifeTimeSec = 5;
         public float meanVel = 50;
-        public float minMeanVel = 2;
+        public float minMeanVel = 0.03f;
         public float goalDistance;
         public float goalAngle;
-        public float minDistAllowed = 2;
+        public float minDistAllowed = 10;
+        public float score = 0;
 
         public float realTime = 0;
 
@@ -372,7 +374,7 @@ namespace VehicleBehaviour {
                 return gameover;
             }
 
-            realTime = Time.realtimeSinceStartup;
+            realTime = ticks;
 
             if (realTime > minLifeTimeSec)
             {
@@ -403,7 +405,7 @@ namespace VehicleBehaviour {
             {
                 if (crashedOnWall)
                 {
-                    ticksOnCrash = Time.frameCount;
+                    ticksOnCrash = ticks;
                 }
 
                 gameover = true;
@@ -416,13 +418,15 @@ namespace VehicleBehaviour {
             float relativeTravelledDist = distanceTravelled - lowestTravelledDist;
             float relativeGoalDist = (float)Math.Pow(((goalDistance - highestGoalDistance) * 1000.0f), 2.0) + 0.001f;
 
-            float score = (float)((1.0 / relativeGoalDist) + relativeTravelledDist * 1000 + (1.0 / ticksOnCrash));
+            float currentScore = (float)((1.0 / relativeGoalDist) + relativeTravelledDist * 1000 + (1.0 / ticksOnCrash));
 
-            return score;
+            score = currentScore;
+            return currentScore;
         }
         
         // Update everything
         void FixedUpdate () {
+            ticks = ticks + 1;
             // Mesure current speed
             speed = transform.InverseTransformDirection(_rb.velocity).z * 3.6f;
 
