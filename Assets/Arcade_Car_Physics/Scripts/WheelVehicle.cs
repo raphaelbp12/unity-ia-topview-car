@@ -200,8 +200,8 @@ namespace VehicleBehaviour {
             randomThrottle = UnityEngine.Random.Range(-1.0f, 1.0f);
             randomSteering = UnityEngine.Random.Range(-25.0f, 25.0f);
 
-            //randomSteering = 0.0f;
-            //randomThrottle = 0.0f;
+            randomSteering = 25.0f;
+            randomThrottle = 1.0f;
 
             boost = maxBoost;
 
@@ -240,31 +240,59 @@ namespace VehicleBehaviour {
                 boost += Time.deltaTime * boostRegen;
                 if (boost > maxBoost) { boost = maxBoost; }
             }
-
-            GetLaserDistToWall(50, new Vector3(0, 0, 1));
-            GetLaserDistToWall(50, new Vector3(0, 0, -1));
-            GetLaserDistToWall(50, new Vector3(-1, 0, 0));
-            GetLaserDistToWall(50, new Vector3(1, 0, 0));
-
-            GetLaserDistToWall(50, new Vector3(1, 0, 1).normalized);
-            GetLaserDistToWall(50, new Vector3(1, 0, -1).normalized);
-            GetLaserDistToWall(50, new Vector3(-1, 0, 1).normalized);
-            GetLaserDistToWall(50, new Vector3(-1, 0, -1).normalized);
         }
 
         void LateUpdate()
         {
+            GetCarOutputsToNeural();
+
+        }
+
+        List<float> GetCarOutputsToNeural()
+        {
+            List<float> result = new List<float>();
+
+            int maxLaserDistance = 50;
+
             if (goal != null)
             {
                 goalDistance = Vector3.Distance(this.gameObject.transform.position, goal.transform.position);
                 goalAngle = GetGoalAngle();
-
-
-                Debug.Log("goalAngle " + goalAngle);
-
                 Debug.DrawRay(transform.position, transform.TransformDirection(new Vector3((float)Math.Cos((goalAngle * -1) + (float)Math.PI / 2), 0, (float)Math.Sin((goalAngle * -1) + (float)Math.PI / 2))) * 10, Color.blue);
-                //Debug.DrawRay(transform.position, goalDir, Color.blue);
+
+                //Debug.Log("goalAngle " + goalAngle);
+            } else
+            {
+                goalDistance = 0.0f;
+                goalAngle = 0.0f;
+
+                //Debug.Log("goalAngle and distances dont exist ");
             }
+
+            Vector3 velProjected = Vector3.ProjectOnPlane(_rb.velocity, new Vector3(0, 1, 1));
+            float linearVel = Vector3.Dot(velProjected, transform.forward);
+
+            float angVel = _rb.angularVelocity.y;
+
+            Debug.Log("velocidade " + linearVel + " angular " + angVel);
+
+            result.Add(linearVel / 34.96f);
+            result.Add(angVel / 6.0f);
+
+            result.Add(goalDistance);
+            result.Add(goalAngle);
+
+            result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(0, 0, 1)) / maxLaserDistance);
+            result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(0, 0, -1)) / maxLaserDistance);
+            result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(-1, 0, 0)) / maxLaserDistance);
+            result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(1, 0, 0)) / maxLaserDistance);
+
+            result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(1, 0, 1).normalized) / maxLaserDistance);
+            result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(1, 0, -1).normalized) / maxLaserDistance);
+            result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(-1, 0, 1).normalized) / maxLaserDistance);
+            result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(-1, 0, -1).normalized) / maxLaserDistance);
+
+            return result;
         }
 
         float GetGoalAngle ()
@@ -328,19 +356,19 @@ namespace VehicleBehaviour {
             // Get all the inputs!
             if (isPlayer) {
                 // Accelerate & brake
-                //if (throttleInput != "" && throttleInput != null)
-                //{
-                //    throttle = GetInput(throttleInput) - GetInput(brakeInput);
-                //    Debug.Log("throttle " + throttle);
-                //}
+                if (throttleInput != "" && throttleInput != null)
+                {
+                    throttle = GetInput(throttleInput) - GetInput(brakeInput);
+                    Debug.Log("throttle " + throttle);
+                }
 
-                throttle = randomThrottle;
+                //throttle = randomThrottle;
                 //Debug.Log("throttle " + throttle);
                 // Boost
                 boosting = (GetInput(boostInput) > 0.5f);
                 // Turn
                 steering = turnInputCurve.Evaluate(GetInput(turnInput)) * steerAngle;
-                steering = randomSteering;
+                //steering = randomSteering;
 
                 //Debug.Log("steering " + steering);
                 // Dirft

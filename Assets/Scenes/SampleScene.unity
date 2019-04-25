@@ -132,7 +132,7 @@ GameObject:
   - component: {fileID: 4282645}
   - component: {fileID: 4282644}
   - component: {fileID: 4282643}
-  m_Layer: 9
+  m_Layer: 8
   m_Name: Goal
   m_TagString: Goal
   m_Icon: {fileID: 0}
