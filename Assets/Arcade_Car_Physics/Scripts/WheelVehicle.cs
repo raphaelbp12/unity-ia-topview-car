@@ -197,6 +197,7 @@ namespace VehicleBehaviour {
         public float goalAngle;
         public float minDistAllowed = 10;
         public float score = 0;
+        public float relativeGoalDistance = 0;
 
         public float realTime = 0;
 
@@ -416,9 +417,9 @@ namespace VehicleBehaviour {
         public float CalculateScore(float lowestTravelledDist, float highestGoalDistance)
         {
             float relativeTravelledDist = distanceTravelled - lowestTravelledDist;
-            float relativeGoalDist = (float)Math.Pow(((goalDistance - highestGoalDistance) * 1000.0f), 2.0) + 0.001f;
+            relativeGoalDistance = (float)Math.Pow(((goalDistance - highestGoalDistance) * 10.0f), 2.0) + 0.001f;
 
-            float currentScore = (float)((1.0 / relativeGoalDist) + relativeTravelledDist * 1000 + (1.0 / ticksOnCrash));
+            float currentScore = (float)((1.0 * relativeGoalDistance) + relativeTravelledDist * 1000 + (1.0 / ticksOnCrash));
 
             score = currentScore;
             return currentScore;
