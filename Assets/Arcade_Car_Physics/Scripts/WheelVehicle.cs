@@ -184,6 +184,7 @@ namespace VehicleBehaviour {
         private GameObject goal;
         private bool goalReached = false;
         public float goalDistance;
+        public float goalAngle;
 
         // Init rigidbody, center of mass, wheels and more
         void Start() {
@@ -198,6 +199,9 @@ namespace VehicleBehaviour {
 
             randomThrottle = UnityEngine.Random.Range(-1.0f, 1.0f);
             randomSteering = UnityEngine.Random.Range(-25.0f, 25.0f);
+
+            //randomSteering = 0.0f;
+            //randomThrottle = 0.0f;
 
             boost = maxBoost;
 
@@ -219,6 +223,7 @@ namespace VehicleBehaviour {
             }
 
             goalDistance = 0.0f;
+            goalAngle = 0.0f;
         }
 
         // Visual feedbacks and boost regen
@@ -249,7 +254,36 @@ namespace VehicleBehaviour {
 
         void LateUpdate()
         {
-            //goalDistance = Vector3.Distance(this.gameObject.transform.position, goal.transform.position);
+            if (goal != null)
+            {
+                goalDistance = Vector3.Distance(this.gameObject.transform.position, goal.transform.position);
+                goalAngle = GetGoalAngle();
+
+
+                Debug.Log("goalAngle " + goalAngle);
+
+                Debug.DrawRay(transform.position, transform.TransformDirection(new Vector3((float)Math.Cos((goalAngle * -1) + (float)Math.PI / 2), 0, (float)Math.Sin((goalAngle * -1) + (float)Math.PI / 2))) * 10, Color.blue);
+                //Debug.DrawRay(transform.position, goalDir, Color.blue);
+            }
+        }
+
+        float GetGoalAngle ()
+        {
+            float goalAng = Vector3.Angle(this.gameObject.transform.position, goal.transform.position);
+            Vector3 goalDir = goal.transform.position - this.gameObject.transform.position;
+
+            goalAng = (float)Math.Acos(Vector3.Dot(goalDir.normalized, transform.forward));
+            float whichWay = Vector3.Cross(transform.forward, goalDir.normalized).y;
+            goalAng = (goalAng + (float)Math.PI / 2) * (Math.Sign(whichWay) * -1);
+
+            if (goalAng < 0)
+            {
+                goalAng = goalAng + (float)Math.PI;
+            }
+
+            goalAng = (goalAng - (float)Math.PI / 2) * -1;
+
+            return goalAng;
         }
 
         float GetLaserDistToWall(float maxDist, Vector3 direction)

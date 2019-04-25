@@ -35,7 +35,7 @@ public class GameRulesController : MonoBehaviour
         WheelVehicle[] newCars = FindObjectsOfType<WheelVehicle>();
         if (activeCarIndex < newCars.Length)
         {
-            text.text = "goalDistance " + newCars[activeCarIndex].goalDistance.ToString();
+            text.text = "goalDistance " + newCars[activeCarIndex].goalDistance.ToString() + " " + "goalAngle " + newCars[activeCarIndex].goalAngle.ToString();
         }
         SelectCarToCamera(newCars);
     }
