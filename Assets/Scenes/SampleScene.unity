@@ -640,7 +640,8 @@ MonoBehaviour:
     type: 3}
   camera: {fileID: 963194225}
   text: {fileID: 880406870}
-  numCars: 300
+  numCars: 100
+  carsOrdered: []
 --- !u!4 &900292624
 Transform:
   m_ObjectHideFlags: 0

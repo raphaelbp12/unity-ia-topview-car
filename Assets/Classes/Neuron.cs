@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Assets.Classes
 {
-    class Neuron
+    public class Neuron
     {
         public float activationValue;
         public List<float> weights;
@@ -42,7 +42,8 @@ namespace Assets.Classes
         {
             if (input != null)
             {
-                return (float)input;
+                activationValue = input.Value;
+                return input.Value;
             } else
             {
                 float value = 0;

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Assets.Classes
 {
-    class Layer
+    public class Layer
     {
         public List<Neuron> neurons = new List<Neuron>();
 
@@ -17,7 +17,7 @@ namespace Assets.Classes
                 GetInputs(inputs);
             } else
             {
-
+                GenerateLayer(neuronsCount, previousNeurons, receivedWeights);
             }
         }
 
