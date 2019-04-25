@@ -180,6 +180,8 @@ namespace VehicleBehaviour {
         Rigidbody _rb;
         WheelCollider[] wheels;
 
+        public bool showDebugDraw = true;
+
         private float randomThrottle;
         private float randomSteering;
         private GameObject goal;
@@ -203,7 +205,7 @@ namespace VehicleBehaviour {
         public float realTime = 0;
 
         public List<Layer> neuralLayers = new List<Layer>();
-        private List<Layer> parentLayers = new List<Layer>();
+        public List<Layer> parentLayers = new List<Layer>();
 
         // Init rigidbody, center of mass, wheels and more
         void Start() {
@@ -284,7 +286,8 @@ namespace VehicleBehaviour {
             {
                 goalDistance = Vector3.Distance(this.gameObject.transform.position, goal.transform.position);
                 goalAngle = GetGoalAngle();
-                Debug.DrawRay(transform.position, transform.TransformDirection(new Vector3((float)Math.Cos((goalAngle * -1) + (float)Math.PI / 2), 0, (float)Math.Sin((goalAngle * -1) + (float)Math.PI / 2))) * 10, Color.blue);
+                if(showDebugDraw)
+                    Debug.DrawRay(transform.position, transform.TransformDirection(new Vector3((float)Math.Cos((goalAngle * -1) + (float)Math.PI / 2), 0, (float)Math.Sin((goalAngle * -1) + (float)Math.PI / 2))) * 10, Color.blue);
 
                 //Debug.Log("goalAngle " + goalAngle);
             } else
@@ -358,17 +361,20 @@ namespace VehicleBehaviour {
                 //Debug.Log("Did Hit  " + hit.collider.gameObject.tag);
                 if (hit.collider.CompareTag("Wall"))
                 {
-                    Debug.DrawRay(transform.position, transformDir * hit.distance, Color.green);
+                    if (showDebugDraw)
+                        Debug.DrawRay(transform.position, transformDir * hit.distance, Color.green);
                     return hit.distance;
                 } else
                 {
-                    Debug.DrawRay(transform.position, transformDir * hit.distance, Color.yellow);
+                    if (showDebugDraw)
+                        Debug.DrawRay(transform.position, transformDir * hit.distance, Color.yellow);
                     return maxDist;
                 }
             }
             else
             {
-                Debug.DrawRay(transform.position, transformDir * maxDist, Color.red);
+                if (showDebugDraw)
+                    Debug.DrawRay(transform.position, transformDir * maxDist, Color.red);
                 //Debug.Log("Did not Hit");
                 return maxDist;
             }
@@ -435,7 +441,7 @@ namespace VehicleBehaviour {
         {
             List<Layer> newLayers = new List<Layer>();
 
-            if (parentLayers.Count > 0)
+            if (parentLayers.Count > 0 && neuralLayers.Count == 0)
             {
                 newLayers = parentLayers;
             }
@@ -460,7 +466,7 @@ namespace VehicleBehaviour {
                 randomThrottle = vels[0];
                 randomSteering = vels[1];
 
-                Debug.Log("randomThrottle " + randomThrottle + " randomSteering " + randomSteering);
+                //Debug.Log("randomThrottle " + randomThrottle + " randomSteering " + randomSteering);
             }
 
             neuralLayers = newLayers;

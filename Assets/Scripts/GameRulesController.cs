@@ -8,32 +8,25 @@ using VehicleBehaviour;
 public class GameRulesController : MonoBehaviour
 {
     // Reference to the Prefab. Drag a Prefab into this field in the Inspector.
+
+    public int generations = 0;
     public GameObject myPrefab;
     public GameObject camera;
     public Text text;
 
-    public int numCars;
+    public int numCars = 10;
     private GameObject[] cars;
     private int activeCarIndex;
 
     public List<WheelVehicle> carsOrdered;
+    public List<WheelVehicle> thisGenerationCars;
+
+    private List<List<WheelVehicle>> carsHistory = new List<List<WheelVehicle>>();
 
     // This script will simply instantiate the Prefab when the game starts.
     void Start()
     {
-        cars = new GameObject[numCars];
-        carsOrdered = new List<WheelVehicle>();
-        // Instantiate at position (0, 0, 0) and zero rotation.
-        for (int i = 0; i < numCars; i++)
-        {
-            GameObject car = Instantiate(myPrefab, new Vector3(0, 0, 0), Quaternion.identity);
-            WheelVehicle carComp = car.GetComponent<WheelVehicle>();
-
-            Debug.Log("car " + car.ToString());
-            cars[i] = car;
-        }
-        activeCarIndex = 0;
-        text.text = "goalDistance unset";
+        GenerateCars(new List<WheelVehicle>());
     }
 
     void FixedUpdate()
@@ -66,6 +59,7 @@ public class GameRulesController : MonoBehaviour
                 }
             }
 
+
             foreach (WheelVehicle car in newCars)
             {
                 float score = car.CalculateScore(lowestTravelledDist, highestGoalDistance);
@@ -75,6 +69,9 @@ public class GameRulesController : MonoBehaviour
 
 
             SelectCarToCamera(carsOrdered);
+        } else
+        {
+            GenerateNewPop();
         }
     }
 
@@ -97,5 +94,74 @@ public class GameRulesController : MonoBehaviour
             }
             camera.SendMessage("SetCar", newCars[activeCarIndex].gameObject);
         }
+    }
+
+    void GenerateCars(List<WheelVehicle> newCars)
+    {
+        generations += 1;
+        thisGenerationCars = new List<WheelVehicle>();
+        cars = new GameObject[numCars];
+        carsOrdered = new List<WheelVehicle>();
+        // Instantiate at position (0, 0, 0) and zero rotation.
+        for (int i = 0; i < numCars; i++)
+        {
+            GameObject car = Instantiate(myPrefab, new Vector3(0, 0, 0), Quaternion.identity);
+            WheelVehicle carComp = car.GetComponent<WheelVehicle>();
+
+            if (newCars.Count > 0)
+            {
+                carComp.parentLayers = newCars[i].neuralLayers;
+            }
+
+            thisGenerationCars.Add(carComp);
+
+            Debug.Log("car " + car.ToString());
+            cars[i] = car;
+        }
+        activeCarIndex = 0;
+        text.text = "goalDistance unset";
+    }
+
+    void GenerateNewPop()
+    {
+        float highestScore = 0.0f;
+
+        List<WheelVehicle> carListProbabilities = new List<WheelVehicle>();
+
+        List<WheelVehicle> newCars = new List<WheelVehicle>();
+
+        foreach (WheelVehicle car in thisGenerationCars)
+        {
+            float thisCarScore = car.score;
+
+            if (thisCarScore > highestScore)
+                highestScore = thisCarScore;
+        }
+
+        foreach (WheelVehicle car in thisGenerationCars)
+        {
+            float probability = UnityEngine.Mathf.Floor(car.score/highestScore * 100);
+
+            for(int i = 0; i < probability; i++)
+            {
+                carListProbabilities.Add(car);
+            }
+        }
+
+        for(int i = 0; i < numCars; i++)
+        {
+            int carChosenIndex = UnityEngine.Mathf.FloorToInt(UnityEngine.Random.Range(0.0f, 1.0f) * carListProbabilities.Count);
+            newCars.Add(carListProbabilities[carChosenIndex]);
+        }
+
+        carsHistory.Add(carsOrdered);
+        carsOrdered = new List<WheelVehicle>();
+
+        GenerateCars(newCars);
+        
+        //for(int i = 0; i < cars.Length; i++)
+        //{
+        //    cars[i].
+        //}
     }
 }
