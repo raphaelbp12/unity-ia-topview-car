@@ -3,6 +3,7 @@
  * 
  * This is distributed under the MIT Licence (see LICENSE.md for details)
  */
+using Assets.Classes;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -165,6 +166,8 @@ namespace VehicleBehaviour {
         [SerializeField] float boostForce = 5000;
         public float BoostForce { get { return boostForce; } set { boostForce = value; } }
 
+        internal List<Layer> NeuralLayers { get => neuralLayers; set => neuralLayers = value; }
+
         // Use this to boost when IsPlayer is set to false
         public bool boosting = false;
         // Use this to jump when IsPlayer is set to false
@@ -200,6 +203,9 @@ namespace VehicleBehaviour {
         public float relativeGoalDistance = 0;
 
         public float realTime = 0;
+
+        private List<Layer> neuralLayers;
+        private List<Layer> parentLayers = new List<Layer>();
 
         // Init rigidbody, center of mass, wheels and more
         void Start() {
@@ -261,6 +267,8 @@ namespace VehicleBehaviour {
             GetCarOutputsToNeural();
 
             CalcGameover();
+
+            NeuralNetwork();
         }
 
         void LateUpdate()
@@ -423,6 +431,34 @@ namespace VehicleBehaviour {
 
             score = currentScore;
             return currentScore;
+        }
+
+        private void NeuralNetwork ()
+        {
+            List<Layer> newLayers = new List<Layer>();
+
+            if (parentLayers.Count > 0)
+            {
+                newLayers = parentLayers;
+            }
+
+            List<float> neuralInputs = GetCarOutputsToNeural();
+
+            Layer firstLayer = new Layer(neuralInputs, neuralInputs.Count, new List<Neuron>(), new List<List<float>>());
+            newLayers.Add(firstLayer);
+
+            List<List<float>> firstLayerWeights = neuralLayers.Count > 0 ? neuralLayers[0].GetWeights() : new List<List<float>>();
+            Layer secondLayer = new Layer(new List<float>(), 21, firstLayer.neurons, firstLayerWeights);
+            newLayers.Add(secondLayer);
+
+            List<List<float>> secondLayerWeights = neuralLayers.Count > 1 ? neuralLayers[1].GetWeights() : new List<List<float>>();
+            Layer thirdLayer = new Layer(new List<float>(), 2, secondLayer.neurons, secondLayerWeights);
+            newLayers.Add(thirdLayer);
+
+            List<float> vels = thirdLayer.GetOutputs();
+
+            randomThrottle = vels[0];
+            randomSteering = vels[1];
         }
         
         // Update everything

@@ -27,6 +27,8 @@ public class GameRulesController : MonoBehaviour
         for (int i = 0; i < numCars; i++)
         {
             GameObject car = Instantiate(myPrefab, new Vector3(0, 0, 0), Quaternion.identity);
+            WheelVehicle carComp = car.GetComponent<WheelVehicle>();
+
             Debug.Log("car " + car.ToString());
             cars[i] = car;
         }
