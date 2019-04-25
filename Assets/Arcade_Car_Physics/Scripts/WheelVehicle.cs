@@ -200,8 +200,8 @@ namespace VehicleBehaviour {
             randomThrottle = UnityEngine.Random.Range(-1.0f, 1.0f);
             randomSteering = UnityEngine.Random.Range(-25.0f, 25.0f);
 
-            randomSteering = 25.0f;
-            randomThrottle = 1.0f;
+            //randomSteering = 25.0f;
+            //randomThrottle = 1.0f;
 
             boost = maxBoost;
 
@@ -356,19 +356,19 @@ namespace VehicleBehaviour {
             // Get all the inputs!
             if (isPlayer) {
                 // Accelerate & brake
-                if (throttleInput != "" && throttleInput != null)
-                {
-                    throttle = GetInput(throttleInput) - GetInput(brakeInput);
-                    Debug.Log("throttle " + throttle);
-                }
+                //if (throttleInput != "" && throttleInput != null)
+                //{
+                //    throttle = GetInput(throttleInput) - GetInput(brakeInput);
+                //    Debug.Log("throttle " + throttle);
+                //}
 
-                //throttle = randomThrottle;
+                throttle = randomThrottle;
                 //Debug.Log("throttle " + throttle);
                 // Boost
                 boosting = (GetInput(boostInput) > 0.5f);
                 // Turn
-                steering = turnInputCurve.Evaluate(GetInput(turnInput)) * steerAngle;
-                //steering = randomSteering;
+                //steering = turnInputCurve.Evaluate(GetInput(turnInput)) * steerAngle;
+                steering = randomSteering;
 
                 //Debug.Log("steering " + steering);
                 // Dirft

@@ -22,7 +22,7 @@ public class GameRulesController : MonoBehaviour
         // Instantiate at position (0, 0, 0) and zero rotation.
         for(int i = 0; i < numCars; i++)
         {
-            GameObject car = Instantiate(myPrefab, new Vector3(-40, 0, 0), Quaternion.identity);
+            GameObject car = Instantiate(myPrefab, new Vector3(0, 0, 0), Quaternion.identity);
             Debug.Log("car " + car.ToString());
             cars[i] = car;
         }
