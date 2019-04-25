@@ -183,8 +183,20 @@ namespace VehicleBehaviour {
         private float randomSteering;
         private GameObject goal;
         private bool goalReached = false;
+        private Vector3 lastPosition;
+        private bool gameover = false;
+
+        public int ticksOnCrash = 3000;
+        public float distanceTravelled = 0.0f;
+        public int maxLifeTimeSec = 25;
+        public int minLifeTimeSec = 5;
+        public float meanVel = 50;
+        public float minMeanVel = 2;
         public float goalDistance;
         public float goalAngle;
+        public float minDistAllowed = 2;
+
+        public float realTime = 0;
 
         // Init rigidbody, center of mass, wheels and more
         void Start() {
@@ -222,6 +234,7 @@ namespace VehicleBehaviour {
                 wheel.motorTorque = 0.0001f;
             }
 
+            lastPosition = transform.position;
             goalDistance = 0.0f;
             goalAngle = 0.0f;
         }
@@ -229,6 +242,8 @@ namespace VehicleBehaviour {
         // Visual feedbacks and boost regen
         void Update()
         {
+            distanceTravelled += Vector3.Distance(transform.position, lastPosition);
+            lastPosition = transform.position;
             foreach (ParticleSystem gasParticle in gasParticles)
             {
                 gasParticle.Play();
@@ -240,11 +255,13 @@ namespace VehicleBehaviour {
                 boost += Time.deltaTime * boostRegen;
                 if (boost > maxBoost) { boost = maxBoost; }
             }
+            GetCarOutputsToNeural();
+
+            CalcGameover();
         }
 
         void LateUpdate()
         {
-            GetCarOutputsToNeural();
 
         }
 
@@ -274,7 +291,7 @@ namespace VehicleBehaviour {
 
             float angVel = _rb.angularVelocity.y;
 
-            Debug.Log("velocidade " + linearVel + " angular " + angVel);
+            //Debug.Log("velocidade " + linearVel + " angular " + angVel);
 
             result.Add(linearVel / 34.96f);
             result.Add(angVel / 6.0f);
@@ -337,15 +354,71 @@ namespace VehicleBehaviour {
                 } else
                 {
                     Debug.DrawRay(transform.position, transformDir * hit.distance, Color.yellow);
-                    return 0.0f;
+                    return maxDist;
                 }
             }
             else
             {
                 Debug.DrawRay(transform.position, transformDir * maxDist, Color.red);
                 //Debug.Log("Did not Hit");
-                return 0.0f;
+                return maxDist;
             }
+        }
+
+        bool CalcGameover()
+        {
+            if (gameover)
+            {
+                return gameover;
+            }
+
+            realTime = Time.realtimeSinceStartup;
+
+            if (realTime > minLifeTimeSec)
+            {
+                if (distanceTravelled < minDistAllowed)
+                {
+                    setGameover(false, "distancia percorrida mto pequena");
+                }
+
+                meanVel = distanceTravelled / realTime;
+
+                if (meanVel < minMeanVel)
+                {
+                    setGameover(false, "velocidade media baixa");
+                }
+            }
+
+            if (realTime > maxLifeTimeSec)
+                setGameover(false, "maxLifeTimeSec");
+
+
+            return gameover;
+        }
+
+        void setGameover(bool crashedOnWall, string reason)
+        {
+            Debug.Log("setGameoverCalled " + reason);
+            if(!gameover)
+            {
+                if (crashedOnWall)
+                {
+                    ticksOnCrash = Time.frameCount;
+                }
+
+                gameover = true;
+                gameObject.SetActive(false);
+            }
+        }
+
+        float CalculateScore(float lowestTravelledDist, float highestGoalDistance)
+        {
+            float relativeTravelledDist = distanceTravelled - lowestTravelledDist;
+            float relativeGoalDist = (float)Math.Pow(((goalDistance - highestGoalDistance) * 1000.0f), 2.0) + 0.001f;
+
+            float score = (float)((1.0 / relativeGoalDist) + relativeTravelledDist * 1000 + (1.0 / ticksOnCrash));
+
+            return score;
         }
         
         // Update everything
@@ -501,8 +574,8 @@ namespace VehicleBehaviour {
             if (other.gameObject.CompareTag("Wall"))
             {
                 Debug.Log("collide wall");
+                setGameover(true, "bateu na parede");
                 //other.gameObject.SetActive(false);
-                this.gameObject.SetActive(false);
                 //Debug.Log("position: " + this.gameObject.transform.position.ToString());
             } else if (other.gameObject.CompareTag("Goal"))
             {
