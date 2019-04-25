@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using VehicleBehaviour;
@@ -15,12 +16,15 @@ public class GameRulesController : MonoBehaviour
     private GameObject[] cars;
     private int activeCarIndex;
 
+    public List<WheelVehicle> carsOrdered;
+
     // This script will simply instantiate the Prefab when the game starts.
     void Start()
     {
         cars = new GameObject[numCars];
+        carsOrdered = new List<WheelVehicle>();
         // Instantiate at position (0, 0, 0) and zero rotation.
-        for(int i = 0; i < numCars; i++)
+        for (int i = 0; i < numCars; i++)
         {
             GameObject car = Instantiate(myPrefab, new Vector3(0, 0, 0), Quaternion.identity);
             Debug.Log("car " + car.ToString());
@@ -32,22 +36,54 @@ public class GameRulesController : MonoBehaviour
 
     void FixedUpdate()
     {
+    }
+
+    void Update()
+    {
         WheelVehicle[] newCars = FindObjectsOfType<WheelVehicle>();
         if (activeCarIndex < newCars.Length)
         {
             text.text = "goalDistance " + newCars[activeCarIndex].goalDistance.ToString() + " " + "goalAngle " + newCars[activeCarIndex].goalAngle.ToString();
         }
-        SelectCarToCamera(newCars);
-    }
 
-    void SelectCarToCamera(WheelVehicle[] newCars)
-    {
         if (newCars.Length > 0)
         {
-            if (!newCars[activeCarIndex].gameObject.activeInHierarchy)
+            float lowestTravelledDist = newCars[0].distanceTravelled;
+            float highestGoalDistance = 0.0f;
+
+            foreach (WheelVehicle car in newCars)
             {
-                Debug.Log("newCars length " + newCars.Length);
-                for (int i = 0; i < newCars.Length; i++)
+                if (car.distanceTravelled < lowestTravelledDist)
+                {
+                    lowestTravelledDist = car.distanceTravelled;
+                }
+
+                if (car.goalDistance > highestGoalDistance)
+                {
+                    highestGoalDistance = car.goalDistance;
+                }
+            }
+
+            foreach (WheelVehicle car in newCars)
+            {
+                float score = car.CalculateScore(lowestTravelledDist, highestGoalDistance);
+            }
+
+            carsOrdered = newCars.ToList().OrderByDescending(o => o.score).ToList();
+
+
+            SelectCarToCamera(carsOrdered);
+        }
+    }
+
+    void SelectCarToCamera(List<WheelVehicle> newCars)
+    {
+        if (newCars.Count > 0)
+        {
+            if (!newCars[0].gameObject.activeInHierarchy)
+            {
+                Debug.Log("newCars length " + newCars.Count);
+                for (int i = 0; i < newCars.Count; i++)
                 {
                     var car = newCars[i];
                     if (car.gameObject.activeInHierarchy)

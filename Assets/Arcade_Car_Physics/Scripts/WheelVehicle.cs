@@ -413,7 +413,7 @@ namespace VehicleBehaviour {
             }
         }
 
-        float CalculateScore(float lowestTravelledDist, float highestGoalDistance)
+        public float CalculateScore(float lowestTravelledDist, float highestGoalDistance)
         {
             float relativeTravelledDist = distanceTravelled - lowestTravelledDist;
             float relativeGoalDist = (float)Math.Pow(((goalDistance - highestGoalDistance) * 1000.0f), 2.0) + 0.001f;
