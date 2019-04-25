@@ -55,7 +55,52 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 114822347051870414, guid: af384ca59b0f24483b0163f2ae19fe10,
+    - target: {fileID: 114415631047791334, guid: af384ca59b0f24483b0163f2ae19fe10,
+        type: 3}
+      propertyPath: jumping
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 146802126822764044, guid: af384ca59b0f24483b0163f2ae19fe10,
+        type: 3}
+      propertyPath: m_SuspensionSpring.spring
+      value: 50000
+      objectReference: {fileID: 0}
+    - target: {fileID: 146802126822764044, guid: af384ca59b0f24483b0163f2ae19fe10,
+        type: 3}
+      propertyPath: m_SuspensionSpring.damper
+      value: 6000
+      objectReference: {fileID: 0}
+    - target: {fileID: 146793865263719070, guid: af384ca59b0f24483b0163f2ae19fe10,
+        type: 3}
+      propertyPath: m_SuspensionSpring.spring
+      value: 50000
+      objectReference: {fileID: 0}
+    - target: {fileID: 146793865263719070, guid: af384ca59b0f24483b0163f2ae19fe10,
+        type: 3}
+      propertyPath: m_SuspensionSpring.damper
+      value: 6000
+      objectReference: {fileID: 0}
+    - target: {fileID: 146504509095465980, guid: af384ca59b0f24483b0163f2ae19fe10,
+        type: 3}
+      propertyPath: m_SuspensionSpring.spring
+      value: 50000
+      objectReference: {fileID: 0}
+    - target: {fileID: 146504509095465980, guid: af384ca59b0f24483b0163f2ae19fe10,
+        type: 3}
+      propertyPath: m_SuspensionSpring.damper
+      value: 6000
+      objectReference: {fileID: 0}
+    - target: {fileID: 146014540103652148, guid: af384ca59b0f24483b0163f2ae19fe10,
+        type: 3}
+      propertyPath: m_SuspensionSpring.spring
+      value: 50000
+      objectReference: {fileID: 0}
+    - target: {fileID: 146014540103652148, guid: af384ca59b0f24483b0163f2ae19fe10,
+        type: 3}
+      propertyPath: m_SuspensionSpring.damper
+      value: 6000
+      objectReference: {fileID: 0}
+    - target: {fileID: 114800290297643028, guid: af384ca59b0f24483b0163f2ae19fe10,
         type: 3}
       propertyPath: m_Enabled
       value: 0
@@ -65,12 +110,32 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 114303260965533220, guid: af384ca59b0f24483b0163f2ae19fe10,
+    - target: {fileID: 114822347051870414, guid: af384ca59b0f24483b0163f2ae19fe10,
         type: 3}
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114649827415014558, guid: af384ca59b0f24483b0163f2ae19fe10,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114507247422366396, guid: af384ca59b0f24483b0163f2ae19fe10,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114526905319013540, guid: af384ca59b0f24483b0163f2ae19fe10,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114303260965533220, guid: af384ca59b0f24483b0163f2ae19fe10,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114341878329182152, guid: af384ca59b0f24483b0163f2ae19fe10,
         type: 3}
       propertyPath: m_Enabled
       value: 0

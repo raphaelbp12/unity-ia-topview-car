@@ -235,11 +235,56 @@ namespace VehicleBehaviour {
                 boost += Time.deltaTime * boostRegen;
                 if (boost > maxBoost) { boost = maxBoost; }
             }
+
+            GetLaserDistToWall(50, new Vector3(0, 0, 1));
+            GetLaserDistToWall(50, new Vector3(0, 0, -1));
+            GetLaserDistToWall(50, new Vector3(-1, 0, 0));
+            GetLaserDistToWall(50, new Vector3(1, 0, 0));
+
+            GetLaserDistToWall(50, new Vector3(1, 0, 1).normalized);
+            GetLaserDistToWall(50, new Vector3(1, 0, -1).normalized);
+            GetLaserDistToWall(50, new Vector3(-1, 0, 1).normalized);
+            GetLaserDistToWall(50, new Vector3(-1, 0, -1).normalized);
         }
 
         void LateUpdate()
         {
-            goalDistance = Vector3.Distance(this.gameObject.transform.position, goal.transform.position);
+            //goalDistance = Vector3.Distance(this.gameObject.transform.position, goal.transform.position);
+        }
+
+        float GetLaserDistToWall(float maxDist, Vector3 direction)
+        {
+            // Bit shift the index of the layer (8) to get a bit mask
+            int layerMask = 1 << 8;
+
+            // This would cast rays only against colliders in layer 8.
+            // But instead we want to collide against everything except layer 8. The ~ operator does this, it inverts a bitmask.
+            layerMask = ~layerMask;
+
+            RaycastHit hit;
+            // Does the ray intersect any objects excluding the player layer
+
+            Vector3 transformDir = Vector3.ProjectOnPlane(transform.TransformDirection(direction), new Vector3(0, 1, 0));
+
+            if (Physics.Raycast(transform.position, transformDir, out hit, maxDist, layerMask))
+            {
+                //Debug.Log("Did Hit  " + hit.collider.gameObject.tag);
+                if (hit.collider.CompareTag("Wall"))
+                {
+                    Debug.DrawRay(transform.position, transformDir * hit.distance, Color.green);
+                    return hit.distance;
+                } else
+                {
+                    Debug.DrawRay(transform.position, transformDir * hit.distance, Color.yellow);
+                    return 0.0f;
+                }
+            }
+            else
+            {
+                Debug.DrawRay(transform.position, transformDir * maxDist, Color.red);
+                //Debug.Log("Did not Hit");
+                return 0.0f;
+            }
         }
         
         // Update everything
