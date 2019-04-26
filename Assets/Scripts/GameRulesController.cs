@@ -27,6 +27,8 @@ public class GameRulesController : MonoBehaviour
     public float highestTravelledDist;
     public float highestGoalDistance;
     public float highestTicksOnCrash;
+    public float highestSteering = 0;
+    public float highestThrottle = 0;
 
     public float mutationProbability = 0.1f;
 
@@ -123,12 +125,16 @@ public class GameRulesController : MonoBehaviour
         for (int i = 0; i < numCars; i++)
         {
             GameObject car = Instantiate(myPrefab, spawnPoint.transform.position, Quaternion.identity);
-            WheelVehicle carComp = car.GetComponent<WheelVehicle>();
+            WheelVehicle carComp = new WheelVehicle();
+
+            carComp = car.GetComponent<WheelVehicle>();
 
             if (newCars.Count > 0)
             {
                 carComp.parentLayers = newCars[i].neuralLayers;
             }
+
+            carComp.carName = generations + "-" + i;
 
             thisGenerationCars.Add(carComp);
 
@@ -144,8 +150,6 @@ public class GameRulesController : MonoBehaviour
         float highestScore = 0.0f;
 
         List<WheelVehicle> carListProbabilities = new List<WheelVehicle>();
-
-        List<WheelVehicle> newCars = new List<WheelVehicle>();
 
         foreach (WheelVehicle car in thisGenerationCars)
         {
@@ -163,6 +167,16 @@ public class GameRulesController : MonoBehaviour
             {
                 highestTicksOnCrash = car.ticksOnCrash;
             }
+
+            if (car.maxSteering > highestSteering)
+            {
+                highestSteering = car.maxSteering;
+            }
+
+            if (car.maxThrottle > highestThrottle)
+            {
+                highestThrottle = car.maxThrottle;
+            }
         }
 
         foreach (WheelVehicle car in thisGenerationCars)
@@ -178,9 +192,9 @@ public class GameRulesController : MonoBehaviour
 
         //foreach (WheelVehicle car in thisGenerationCars)
         //{
-        //    float probability = UnityEngine.Mathf.Floor(car.score/highestScore * 100);
+        //    float probability = UnityEngine.Mathf.Floor(car.score / highestScore * 100);
 
-        //    for(int i = 0; i < probability; i++)
+        //    for (int i = 0; i < probability; i++)
         //    {
         //        carListProbabilities.Add(car);
         //    }
@@ -189,13 +203,22 @@ public class GameRulesController : MonoBehaviour
         carListProbabilities.Add(carsOrdered[0]);
         carListProbabilities.Add(carsOrdered[1]);
 
-        newCars = CrossOver(carListProbabilities, numCars);
+
+        List<WheelVehicle> newCars = new List<WheelVehicle>();
+        newCars.Add(carsOrdered[0]);
+        newCars.Add(carsOrdered[1]);
+        newCars.AddRange(CrossOver(carListProbabilities, numCars - 2));
+
+        //for(int i = 0; i < numCars; i++)
+        //{
+        //    newCars.Add(carsOrdered[0]);
+        //}
 
         carsHistory.Add(carsOrdered);
         carsOrdered = new List<WheelVehicle>();
 
         GenerateCars(newCars);
-        
+
         //for(int i = 0; i < cars.Length; i++)
         //{
         //    cars[i].
@@ -227,7 +250,7 @@ public class GameRulesController : MonoBehaviour
                 childrenGenome[mutationPoint].generateWeights(numWeights, new List<float>());
             }
 
-            WheelVehicle childCar = carListProbabilities[carMotherIndex];
+            WheelVehicle childCar = new WheelVehicle();
 
             int genesToSkip = 0;
             List<Neuron> previousLayerNeurons = new List<Neuron>();

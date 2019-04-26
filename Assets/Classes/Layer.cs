@@ -21,6 +21,14 @@ namespace Assets.Classes
             }
         }
 
+        public void ResetLayer()
+        {
+            foreach(Neuron neuron in neurons)
+            {
+                neuron.activationValue = 0;
+            }
+        }
+
         private void GetInputs(List<float> inputs)
         {
             for(int i = 0; i < inputs.Count; i++)
@@ -53,6 +61,25 @@ namespace Assets.Classes
             }
 
             return weights;
+        }
+
+        public string GetWeightsToDebug()
+        {
+            List<float> weights = new List<float>();
+
+            foreach (Neuron neuron in neurons)
+            {
+                weights.AddRange(neuron.weights);
+            }
+
+            string retorno = "";
+            
+            foreach(float weight in weights)
+            {
+                retorno += ", " + weight;
+            }
+
+            return retorno;
         }
 
         public List<float> GetOutputs()

@@ -182,8 +182,8 @@ namespace VehicleBehaviour {
 
         public bool showDebugDraw = true;
 
-        private float randomThrottle;
-        private float randomSteering;
+        public float randomThrottle;
+        public float randomSteering;
         private GameObject goal;
         private bool goalReached = false;
         private Vector3 lastPosition;
@@ -209,7 +209,12 @@ namespace VehicleBehaviour {
         public float linearVel;
         public float angVel;
 
+        public float maxSteering = 0;
+        public float maxThrottle = 0;
+
         public float realTime = 0;
+
+        public string carName = "";
 
         public List<Layer> neuralLayers = new List<Layer>();
         public List<Layer> parentLayers = new List<Layer>();
@@ -287,7 +292,7 @@ namespace VehicleBehaviour {
         {
             List<float> result = new List<float>();
 
-            int maxLaserDistance = 100;
+            int maxLaserDistance = 50;
 
             if (goal != null)
             {
@@ -474,7 +479,12 @@ namespace VehicleBehaviour {
 
             if (parentLayers.Count > 0 && neuralLayers.Count == 0)
             {
-                newLayers = parentLayers;
+                neuralLayers = parentLayers;
+
+                foreach (Layer layer in neuralLayers)
+                {
+                    layer.ResetLayer();
+                }
             }
 
             List<float> neuralInputs = GetCarOutputsToNeural();
@@ -500,6 +510,17 @@ namespace VehicleBehaviour {
             {
                 randomThrottle = vels[0];
                 randomSteering = vels[1];
+
+                if (randomSteering > 1)
+                    randomSteering = 1;
+
+                if (randomSteering > maxSteering)
+                    maxSteering = randomSteering;
+
+                if (randomThrottle > maxThrottle)
+                    maxThrottle = randomThrottle;
+
+                randomSteering = randomSteering * 25;
 
                 //Debug.Log("randomThrottle " + randomThrottle + " randomSteering " + randomSteering);
             }
