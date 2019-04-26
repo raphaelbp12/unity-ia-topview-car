@@ -13,6 +13,7 @@ public class GameRulesController : MonoBehaviour
     public int generations = 0;
     public GameObject myPrefab;
     public GameObject camera;
+    public GameObject spawnPoint;
     public Text text;
     public Text genText;
 
@@ -22,6 +23,9 @@ public class GameRulesController : MonoBehaviour
 
     public List<WheelVehicle> carsOrdered;
     public List<WheelVehicle> thisGenerationCars;
+
+    public float lowestTravelledDist;
+    public float highestGoalDistance;
 
     public float mutationProbability = 0.1f;
 
@@ -49,8 +53,8 @@ public class GameRulesController : MonoBehaviour
 
         if (newCars.Length > 0)
         {
-            float lowestTravelledDist = newCars[0].distanceTravelled;
-            float highestGoalDistance = 0.0f;
+            lowestTravelledDist = newCars[0].distanceTravelled;
+            highestGoalDistance = 0.0f;
 
             foreach (WheelVehicle car in newCars)
             {
@@ -111,7 +115,7 @@ public class GameRulesController : MonoBehaviour
         // Instantiate at position (0, 0, 0) and zero rotation.
         for (int i = 0; i < numCars; i++)
         {
-            GameObject car = Instantiate(myPrefab, new Vector3(0, 0, 0), Quaternion.identity);
+            GameObject car = Instantiate(myPrefab, spawnPoint.transform.position, Quaternion.identity);
             WheelVehicle carComp = car.GetComponent<WheelVehicle>();
 
             if (newCars.Count > 0)
@@ -138,6 +142,7 @@ public class GameRulesController : MonoBehaviour
 
         foreach (WheelVehicle car in thisGenerationCars)
         {
+            car.CalculateScore(lowestTravelledDist, highestGoalDistance);
             float thisCarScore = car.score;
 
             if (thisCarScore > highestScore)

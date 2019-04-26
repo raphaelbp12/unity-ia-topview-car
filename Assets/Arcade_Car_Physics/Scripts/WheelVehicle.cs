@@ -191,6 +191,8 @@ namespace VehicleBehaviour {
 
         public int ticks = 0;
         public int ticksOnCrash = 3000;
+        public int checkpointsReached = 0;
+        public bool hasCrashedOnWall = false;
         public float distanceTravelled = 0.0f;
         public int maxLifeTimeSec = 25;
         public int minLifeTimeSec = 5;
@@ -418,6 +420,7 @@ namespace VehicleBehaviour {
             {
                 if (crashedOnWall)
                 {
+                    hasCrashedOnWall = crashedOnWall;
                     ticksOnCrash = ticks;
                 }
 
@@ -431,7 +434,17 @@ namespace VehicleBehaviour {
             float relativeTravelledDist = distanceTravelled - lowestTravelledDist;
             relativeGoalDistance = (float)Math.Pow(((goalDistance - highestGoalDistance) * 10.0f), 2.0) + 0.001f;
 
-            float currentScore = (float)((1.0 * relativeGoalDistance) + relativeTravelledDist * 1000 + (1.0 / ticksOnCrash));
+            float currentScore = (float)((10.0 * relativeGoalDistance) + relativeTravelledDist * 1000);
+
+            if (hasCrashedOnWall)
+            {
+                currentScore = (currentScore + ((float)Math.Pow(ticksOnCrash, 2) + relativeGoalDistance)) * 0.00001f;
+            }
+
+            if (checkpointsReached > 0)
+            {
+                currentScore = currentScore * checkpointsReached * 2;
+            }
 
             score = currentScore;
             return currentScore;
@@ -452,7 +465,7 @@ namespace VehicleBehaviour {
             newLayers.Add(firstLayer);
 
             List<List<float>> firstLayerWeights = neuralLayers.Count > 1 ? neuralLayers[1].GetWeights() : new List<List<float>>();
-            Layer secondLayer = new Layer(new List<float>(), 21, firstLayer.neurons, firstLayerWeights);
+            Layer secondLayer = new Layer(new List<float>(), 12, firstLayer.neurons, firstLayerWeights);
             newLayers.Add(secondLayer);
 
             List<List<float>> secondLayerWeights = neuralLayers.Count > 2 ? neuralLayers[2].GetWeights() : new List<List<float>>();
@@ -637,17 +650,21 @@ namespace VehicleBehaviour {
         {
             if (other.gameObject.CompareTag("Wall"))
             {
-                Debug.Log("collide wall");
+                //Debug.Log("collide wall");
                 setGameover(true, "bateu na parede");
                 //other.gameObject.SetActive(false);
                 //Debug.Log("position: " + this.gameObject.transform.position.ToString());
             } else if (other.gameObject.CompareTag("Goal"))
             {
-                Debug.Log("collide goal");
+                //Debug.Log("collide goal");
                 //other.gameObject.SetActive(false);
                 this.goalReached = true;
                 this.gameObject.SetActive(false);
                 //Debug.Log("position: " + this.gameObject.transform.position.ToString());
+            } else if (other.gameObject.CompareTag("Checkpoint"))
+            {
+                checkpointsReached += 1;
+                //Debug.Log("collide checkpoint");
             }
             //Destroy(other.gameObject);
         }
