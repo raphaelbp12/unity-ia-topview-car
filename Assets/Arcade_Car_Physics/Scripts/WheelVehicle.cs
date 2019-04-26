@@ -197,12 +197,17 @@ namespace VehicleBehaviour {
         public int maxLifeTimeSec = 25;
         public int minLifeTimeSec = 5;
         public float meanVel = 50;
-        public float minMeanVel = 0.03f;
+        public float minMeanVel = 0.04f;
+        public float minInstantVel = 0.04f;
         public float goalDistance;
         public float goalAngle;
         public float minDistAllowed = 10;
         public float score = 0;
         public float relativeGoalDistance = 0;
+
+
+        public float linearVel;
+        public float angVel;
 
         public float realTime = 0;
 
@@ -301,27 +306,33 @@ namespace VehicleBehaviour {
             }
 
             Vector3 velProjected = Vector3.ProjectOnPlane(_rb.velocity, new Vector3(0, 1, 1));
-            float linearVel = Vector3.Dot(velProjected, transform.forward);
+            linearVel = Vector3.Dot(velProjected, transform.forward);
 
-            float angVel = _rb.angularVelocity.y;
+            angVel = _rb.angularVelocity.y;
 
             //Debug.Log("velocidade " + linearVel + " angular " + angVel);
 
             result.Add(linearVel / 34.96f);
             result.Add(angVel / 6.0f);
 
-            result.Add(goalDistance);
-            result.Add(goalAngle);
+            //result.Add(goalDistance);
+            //result.Add(goalAngle);
 
-            result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(0, 0, 1)) / maxLaserDistance);
-            result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(0, 0, -1)) / maxLaserDistance);
-            result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(-1, 0, 0)) / maxLaserDistance);
-            result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(1, 0, 0)) / maxLaserDistance);
+            result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(0, 0, 1)));
+            result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(0, 0, -1)));
+            result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(0.5f, 0, 0.866f)));
+            result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(-0.5f, 0, 0.866f)));
 
-            result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(1, 0, 1).normalized) / maxLaserDistance);
-            result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(1, 0, -1).normalized) / maxLaserDistance);
-            result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(-1, 0, 1).normalized) / maxLaserDistance);
-            result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(-1, 0, -1).normalized) / maxLaserDistance);
+            result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(0.9659f, 0, 0.2588f)));
+            result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(-0.9659f, 0, 0.2588f)));
+
+            //result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(-1, 0, 0)) / maxLaserDistance);
+            //result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(1, 0, 0)) / maxLaserDistance);
+
+            //result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(1, 0, 1).normalized) / maxLaserDistance);
+            //result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(1, 0, -1).normalized) / maxLaserDistance);
+            //result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(-1, 0, 1).normalized) / maxLaserDistance);
+            //result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(-1, 0, -1).normalized) / maxLaserDistance);
 
             return result;
         }
@@ -404,6 +415,11 @@ namespace VehicleBehaviour {
                 {
                     setGameover(false, "velocidade media baixa");
                 }
+
+                if (linearVel < minInstantVel)
+                {
+                    setGameover(false, "velocidade instantanea baixa");
+                }
             }
 
             if (realTime > maxLifeTimeSec)
@@ -445,7 +461,7 @@ namespace VehicleBehaviour {
 
             if (checkpointsReached > 0)
             {
-                currentScore = currentScore * checkpointsReached;
+                currentScore = currentScore * checkpointsReached * 20;
             }
 
             score = currentScore;
@@ -467,18 +483,18 @@ namespace VehicleBehaviour {
             newLayers.Add(firstLayer);
 
             List<List<float>> firstLayerWeights = neuralLayers.Count > 1 ? neuralLayers[1].GetWeights() : new List<List<float>>();
-            Layer secondLayer = new Layer(new List<float>(), 12, firstLayer.neurons, firstLayerWeights);
+            Layer secondLayer = new Layer(new List<float>(), 7, firstLayer.neurons, firstLayerWeights);
             newLayers.Add(secondLayer);
 
             List<List<float>> secondLayerWeights = neuralLayers.Count > 2 ? neuralLayers[2].GetWeights() : new List<List<float>>();
-            Layer thirdLayer = new Layer(new List<float>(), 2, secondLayer.neurons, secondLayerWeights);
+            Layer thirdLayer = new Layer(new List<float>(), 5, secondLayer.neurons, secondLayerWeights);
             newLayers.Add(thirdLayer);
 
-            //List<List<float>> thirdLayerWeights = neuralLayers.Count > 3 ? neuralLayers[3].GetWeights() : new List<List<float>>();
-            //Layer fourthLayer = new Layer(new List<float>(), 2, thirdLayer.neurons, thirdLayerWeights);
-            //newLayers.Add(fourthLayer);
+            List<List<float>> thirdLayerWeights = neuralLayers.Count > 3 ? neuralLayers[3].GetWeights() : new List<List<float>>();
+            Layer fourthLayer = new Layer(new List<float>(), 2, thirdLayer.neurons, thirdLayerWeights);
+            newLayers.Add(fourthLayer);
 
-            List<float> vels = thirdLayer.GetOutputs();
+            List<float> vels = fourthLayer.GetOutputs();
 
             if(vels.Count > 0)
             {

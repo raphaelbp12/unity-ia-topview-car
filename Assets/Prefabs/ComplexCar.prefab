@@ -72,7 +72,7 @@ PrefabInstance:
     - target: {fileID: 114415631047791334, guid: af384ca59b0f24483b0163f2ae19fe10,
         type: 3}
       propertyPath: minMeanVel
-      value: 0.03
+      value: 0.05
       objectReference: {fileID: 0}
     - target: {fileID: 114415631047791334, guid: af384ca59b0f24483b0163f2ae19fe10,
         type: 3}
@@ -87,12 +87,17 @@ PrefabInstance:
     - target: {fileID: 114415631047791334, guid: af384ca59b0f24483b0163f2ae19fe10,
         type: 3}
       propertyPath: maxLifeTimeSec
-      value: 1200
+      value: 2400
       objectReference: {fileID: 0}
     - target: {fileID: 114415631047791334, guid: af384ca59b0f24483b0163f2ae19fe10,
         type: 3}
       propertyPath: showDebugDraw
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114415631047791334, guid: af384ca59b0f24483b0163f2ae19fe10,
+        type: 3}
+      propertyPath: minInstantVel
+      value: 0.9
       objectReference: {fileID: 0}
     - target: {fileID: 146802126822764044, guid: af384ca59b0f24483b0163f2ae19fe10,
         type: 3}
