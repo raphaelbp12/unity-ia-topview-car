@@ -201,12 +201,12 @@ public class GameRulesController : MonoBehaviour
         //}
 
         carListProbabilities.Add(carsOrdered[0]);
-        carListProbabilities.Add(carsOrdered[1]);
+        carListProbabilities.Add(carsOrdered[0]);
 
 
         List<WheelVehicle> newCars = new List<WheelVehicle>();
         newCars.Add(carsOrdered[0]);
-        newCars.Add(carsOrdered[1]);
+        newCars.Add(carsOrdered[0]);
         newCars.AddRange(CrossOver(carListProbabilities, numCars - 2));
 
         //for(int i = 0; i < numCars; i++)
@@ -240,7 +240,8 @@ public class GameRulesController : MonoBehaviour
 
             int crossOverPoint = UnityEngine.Mathf.FloorToInt(UnityEngine.Random.Range(0.0f, 1.0f) * motherGenome.Count);
 
-            List<Neuron> childrenGenome = motherGenome.Take(crossOverPoint).Concat(fatherGenome.Skip(crossOverPoint)).ToList();
+            //List<Neuron> childrenGenome = motherGenome.Take(crossOverPoint).Concat(fatherGenome.Skip(crossOverPoint)).ToList();
+            List<Neuron> childrenGenome = motherGenome;
 
             int mutationPoint = UnityEngine.Mathf.FloorToInt(UnityEngine.Random.Range(0.0f, 1.0f) * childrenGenome.Count);
 
