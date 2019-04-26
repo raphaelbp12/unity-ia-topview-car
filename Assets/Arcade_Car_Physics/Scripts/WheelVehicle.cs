@@ -471,6 +471,18 @@ namespace VehicleBehaviour {
 
             neuralLayers = newLayers;
         }
+
+        public List<Neuron> GetGenome()
+        {
+            List<Neuron> genome = new List<Neuron>();
+
+            foreach(Layer layer in neuralLayers)
+            {
+                genome.AddRange(layer.neurons.ToArray());
+            }
+
+            return genome;
+        }
         
         // Update everything
         void FixedUpdate () {

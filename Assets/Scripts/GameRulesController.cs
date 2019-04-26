@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Assets.Classes;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -13,6 +14,7 @@ public class GameRulesController : MonoBehaviour
     public GameObject myPrefab;
     public GameObject camera;
     public Text text;
+    public Text genText;
 
     public int numCars = 10;
     private GameObject[] cars;
@@ -20,6 +22,8 @@ public class GameRulesController : MonoBehaviour
 
     public List<WheelVehicle> carsOrdered;
     public List<WheelVehicle> thisGenerationCars;
+
+    public float mutationProbability = 0.1f;
 
     private List<List<WheelVehicle>> carsHistory = new List<List<WheelVehicle>>();
 
@@ -40,6 +44,8 @@ public class GameRulesController : MonoBehaviour
         {
             text.text = "goalDistance " + newCars[activeCarIndex].goalDistance.ToString() + " " + "goalAngle " + newCars[activeCarIndex].goalAngle.ToString();
         }
+
+        genText.text = "Generations: " + generations.ToString();
 
         if (newCars.Length > 0)
         {
@@ -71,7 +77,7 @@ public class GameRulesController : MonoBehaviour
             SelectCarToCamera(carsOrdered);
         } else
         {
-            GenerateNewPop();
+            NaturalSelection();
         }
     }
 
@@ -122,7 +128,7 @@ public class GameRulesController : MonoBehaviour
         text.text = "goalDistance unset";
     }
 
-    void GenerateNewPop()
+    void NaturalSelection()
     {
         float highestScore = 0.0f;
 
@@ -148,11 +154,7 @@ public class GameRulesController : MonoBehaviour
             }
         }
 
-        for(int i = 0; i < numCars; i++)
-        {
-            int carChosenIndex = UnityEngine.Mathf.FloorToInt(UnityEngine.Random.Range(0.0f, 1.0f) * carListProbabilities.Count);
-            newCars.Add(carListProbabilities[carChosenIndex]);
-        }
+        newCars = CrossOver(carListProbabilities, numCars);
 
         carsHistory.Add(carsOrdered);
         carsOrdered = new List<WheelVehicle>();
@@ -163,5 +165,58 @@ public class GameRulesController : MonoBehaviour
         //{
         //    cars[i].
         //}
+    }
+
+    List<WheelVehicle> CrossOver(List<WheelVehicle> carListProbabilities, int numChildren)
+    {
+        List<WheelVehicle> newCars = new List<WheelVehicle>();
+
+        for (int i = 0; i < numChildren; i++)
+        {
+            int carMotherIndex = UnityEngine.Mathf.FloorToInt(UnityEngine.Random.Range(0.0f, 1.0f) * carListProbabilities.Count);
+            int carFatherIndex = UnityEngine.Mathf.FloorToInt(UnityEngine.Random.Range(0.0f, 1.0f) * carListProbabilities.Count);
+
+            List<Neuron> motherGenome = carListProbabilities[carMotherIndex].GetGenome();
+            List<Neuron> fatherGenome = carListProbabilities[carFatherIndex].GetGenome();
+
+
+            int crossOverPoint = UnityEngine.Mathf.FloorToInt(UnityEngine.Random.Range(0.0f, 1.0f) * motherGenome.Count);
+
+            List<Neuron> childrenGenome = motherGenome.Take(crossOverPoint).Concat(fatherGenome.Skip(crossOverPoint)).ToList();
+
+            int mutationPoint = UnityEngine.Mathf.FloorToInt(UnityEngine.Random.Range(0.0f, 1.0f) * childrenGenome.Count);
+
+            if (UnityEngine.Random.Range(0.0f, 1.0f) < mutationProbability)
+            {
+                int numWeights = childrenGenome[mutationPoint].weights.Count();
+                childrenGenome[mutationPoint].generateWeights(numWeights, new List<float>());
+            }
+
+            WheelVehicle childCar = carListProbabilities[carMotherIndex];
+
+            int genesToSkip = 0;
+            List<Neuron> previousLayerNeurons = new List<Neuron>();
+
+            for(int j = 0; j < childCar.neuralLayers.Count; j++)
+            {
+                int genesToTake = childCar.neuralLayers[j].neurons.Count;
+                childCar.neuralLayers[j].neurons = childrenGenome.Skip(genesToSkip).Take(genesToTake).ToList();
+                genesToSkip += genesToTake;
+
+                if (previousLayerNeurons.Count > 0)
+                {
+                    for(int k = 0; k < childCar.neuralLayers[j].neurons.Count; k++)
+                    {
+                        childCar.neuralLayers[j].neurons[k].neuronsPreviousLayer = previousLayerNeurons;
+                    }
+                }
+
+                previousLayerNeurons = childCar.neuralLayers[j].neurons;
+            }
+
+            newCars.Add(childCar);
+        }
+
+        return newCars;
     }
 }

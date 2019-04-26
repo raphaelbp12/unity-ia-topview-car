@@ -10,7 +10,7 @@ namespace Assets.Classes
     {
         public float activationValue;
         public List<float> weights;
-        private List<Neuron> neuronsPreviousLayer;
+        public List<Neuron> neuronsPreviousLayer;
 
         public Neuron (float? input, List<Neuron> previousNeurons, List<float> receivedWeights)
         {
