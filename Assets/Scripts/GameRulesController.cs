@@ -24,8 +24,9 @@ public class GameRulesController : MonoBehaviour
     public List<WheelVehicle> carsOrdered;
     public List<WheelVehicle> thisGenerationCars;
 
-    public float lowestTravelledDist;
+    public float highestTravelledDist;
     public float highestGoalDistance;
+    public float highestTicksOnCrash;
 
     public float mutationProbability = 0.1f;
 
@@ -53,26 +54,32 @@ public class GameRulesController : MonoBehaviour
 
         if (newCars.Length > 0)
         {
-            lowestTravelledDist = newCars[0].distanceTravelled;
+            highestTravelledDist = newCars[0].distanceTravelled;
             highestGoalDistance = 0.0f;
+            highestTicksOnCrash = 0.0f;
 
             foreach (WheelVehicle car in newCars)
             {
-                if (car.distanceTravelled < lowestTravelledDist)
+                if (car.distanceTravelled > highestTravelledDist)
                 {
-                    lowestTravelledDist = car.distanceTravelled;
+                    highestTravelledDist = car.distanceTravelled;
                 }
 
                 if (car.goalDistance > highestGoalDistance)
                 {
                     highestGoalDistance = car.goalDistance;
                 }
+
+                if (car.ticksOnCrash > highestTicksOnCrash)
+                {
+                    highestTicksOnCrash = car.ticksOnCrash;
+                }
             }
 
 
             foreach (WheelVehicle car in newCars)
             {
-                float score = car.CalculateScore(lowestTravelledDist, highestGoalDistance);
+                float score = car.CalculateScore(highestTravelledDist, highestGoalDistance, highestTicksOnCrash);
             }
 
             carsOrdered = newCars.ToList().OrderByDescending(o => o.score).ToList();
@@ -142,22 +149,45 @@ public class GameRulesController : MonoBehaviour
 
         foreach (WheelVehicle car in thisGenerationCars)
         {
-            car.CalculateScore(lowestTravelledDist, highestGoalDistance);
+            if (car.distanceTravelled > highestTravelledDist)
+            {
+                highestTravelledDist = car.distanceTravelled;
+            }
+
+            if (car.goalDistance > highestGoalDistance)
+            {
+                highestGoalDistance = car.goalDistance;
+            }
+
+            if (car.ticksOnCrash > highestTicksOnCrash)
+            {
+                highestTicksOnCrash = car.ticksOnCrash;
+            }
+        }
+
+        foreach (WheelVehicle car in thisGenerationCars)
+        {
+            car.CalculateScore(highestTravelledDist, highestGoalDistance, highestTicksOnCrash);
             float thisCarScore = car.score;
 
             if (thisCarScore > highestScore)
                 highestScore = thisCarScore;
         }
 
-        foreach (WheelVehicle car in thisGenerationCars)
-        {
-            float probability = UnityEngine.Mathf.Floor(car.score/highestScore * 100);
+        carsOrdered = thisGenerationCars.ToList().OrderByDescending(o => o.score).ToList();
 
-            for(int i = 0; i < probability; i++)
-            {
-                carListProbabilities.Add(car);
-            }
-        }
+        //foreach (WheelVehicle car in thisGenerationCars)
+        //{
+        //    float probability = UnityEngine.Mathf.Floor(car.score/highestScore * 100);
+
+        //    for(int i = 0; i < probability; i++)
+        //    {
+        //        carListProbabilities.Add(car);
+        //    }
+        //}
+
+        carListProbabilities.Add(carsOrdered[0]);
+        carListProbabilities.Add(carsOrdered[1]);
 
         newCars = CrossOver(carListProbabilities, numCars);
 

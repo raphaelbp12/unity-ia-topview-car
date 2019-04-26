@@ -282,7 +282,7 @@ namespace VehicleBehaviour {
         {
             List<float> result = new List<float>();
 
-            int maxLaserDistance = 50;
+            int maxLaserDistance = 100;
 
             if (goal != null)
             {
@@ -426,24 +426,26 @@ namespace VehicleBehaviour {
 
                 gameover = true;
                 gameObject.SetActive(false);
+                UnityEngine.Object.Destroy(gameObject);
             }
         }
 
-        public float CalculateScore(float lowestTravelledDist, float highestGoalDistance)
+        public float CalculateScore(float highestTravelledDist, float highestGoalDistance, float highestTicksOnCrash)
         {
-            float relativeTravelledDist = distanceTravelled - lowestTravelledDist;
-            relativeGoalDistance = (float)Math.Pow(((goalDistance - highestGoalDistance) * 10.0f), 2.0) + 0.001f;
+            float relativeTravelledDist = (highestTravelledDist - distanceTravelled + 0.001f) / highestTravelledDist;
 
-            float currentScore = (float)((10.0 * relativeGoalDistance) + relativeTravelledDist * 1000);
+            relativeGoalDistance = (highestGoalDistance - goalDistance + 0.001f) / highestGoalDistance;
 
-            if (hasCrashedOnWall)
-            {
-                currentScore = (currentScore + ((float)Math.Pow(ticksOnCrash, 2) + relativeGoalDistance)) * 0.00001f;
-            }
+            float currentScore = (1.0f / relativeTravelledDist);
+
+            //if (hasCrashedOnWall)
+            //{
+            //    currentScore = 0;
+            //}
 
             if (checkpointsReached > 0)
             {
-                currentScore = currentScore * checkpointsReached * 2;
+                currentScore = currentScore * checkpointsReached;
             }
 
             score = currentScore;
@@ -465,18 +467,18 @@ namespace VehicleBehaviour {
             newLayers.Add(firstLayer);
 
             List<List<float>> firstLayerWeights = neuralLayers.Count > 1 ? neuralLayers[1].GetWeights() : new List<List<float>>();
-            Layer secondLayer = new Layer(new List<float>(), 8, firstLayer.neurons, firstLayerWeights);
+            Layer secondLayer = new Layer(new List<float>(), 12, firstLayer.neurons, firstLayerWeights);
             newLayers.Add(secondLayer);
 
             List<List<float>> secondLayerWeights = neuralLayers.Count > 2 ? neuralLayers[2].GetWeights() : new List<List<float>>();
-            Layer thirdLayer = new Layer(new List<float>(), 8, secondLayer.neurons, secondLayerWeights);
+            Layer thirdLayer = new Layer(new List<float>(), 2, secondLayer.neurons, secondLayerWeights);
             newLayers.Add(thirdLayer);
 
-            List<List<float>> thirdLayerWeights = neuralLayers.Count > 3 ? neuralLayers[3].GetWeights() : new List<List<float>>();
-            Layer fourthLayer = new Layer(new List<float>(), 2, thirdLayer.neurons, thirdLayerWeights);
-            newLayers.Add(fourthLayer);
+            //List<List<float>> thirdLayerWeights = neuralLayers.Count > 3 ? neuralLayers[3].GetWeights() : new List<List<float>>();
+            //Layer fourthLayer = new Layer(new List<float>(), 2, thirdLayer.neurons, thirdLayerWeights);
+            //newLayers.Add(fourthLayer);
 
-            List<float> vels = fourthLayer.GetOutputs();
+            List<float> vels = thirdLayer.GetOutputs();
 
             if(vels.Count > 0)
             {
