@@ -528,6 +528,19 @@ namespace VehicleBehaviour {
             neuralLayers = newLayers;
         }
 
+        public WheelVehicle DeepCopy()
+        {
+            WheelVehicle other = (WheelVehicle)this.MemberwiseClone();
+            other.neuralLayers = new List<Layer>();
+
+            foreach (Layer layer in neuralLayers)
+            {
+                other.neuralLayers.Add(layer.DeepCopy());
+            }
+
+            return other;
+        }
+
         public List<Neuron> GetGenome()
         {
             List<Neuron> genome = new List<Neuron>();

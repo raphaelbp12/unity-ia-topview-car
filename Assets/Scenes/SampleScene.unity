@@ -2811,7 +2811,8 @@ MonoBehaviour:
   highestTicksOnCrash: 0
   highestSteering: 0
   highestThrottle: 0
-  mutationProbability: 0
+  numberOfParents: 20
+  mutationProbability: 0.2
 --- !u!4 &900292624
 Transform:
   m_ObjectHideFlags: 0

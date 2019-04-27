@@ -30,6 +30,8 @@ public class GameRulesController : MonoBehaviour
     public float highestSteering = 0;
     public float highestThrottle = 0;
 
+    public int numberOfParents = 20;
+
     public float mutationProbability = 0.1f;
 
     private List<List<WheelVehicle>> carsHistory = new List<List<WheelVehicle>>();
@@ -200,13 +202,15 @@ public class GameRulesController : MonoBehaviour
         //    }
         //}
 
-        carListProbabilities.Add(carsOrdered[0]);
-        carListProbabilities.Add(carsOrdered[0]);
+        for(int i = 0; i < numberOfParents; i++)
+        {
+            carListProbabilities.Add(carsOrdered[i].DeepCopy());
+        }
 
 
         List<WheelVehicle> newCars = new List<WheelVehicle>();
-        newCars.Add(carsOrdered[0]);
-        newCars.Add(carsOrdered[0]);
+        newCars.Add(carsOrdered[0].DeepCopy());
+        newCars.Add(carsOrdered[1].DeepCopy());
         newCars.AddRange(CrossOver(carListProbabilities, numCars - 2));
 
         //for(int i = 0; i < numCars; i++)
@@ -240,9 +244,9 @@ public class GameRulesController : MonoBehaviour
 
             int crossOverPoint = UnityEngine.Mathf.FloorToInt(UnityEngine.Random.Range(0.0f, 1.0f) * motherGenome.Count);
 
-            //List<Neuron> childrenGenome = motherGenome.Take(crossOverPoint).Concat(fatherGenome.Skip(crossOverPoint)).ToList();
+            List<Neuron> resultGenome = motherGenome.Take(crossOverPoint).Concat(fatherGenome.Skip(crossOverPoint)).ToList();
             List<Neuron> childrenGenome = new List<Neuron>();
-            foreach(Neuron neuron in motherGenome)
+            foreach(Neuron neuron in resultGenome)
             {
                 childrenGenome.Add(neuron.DeepCopy());
             }
@@ -284,7 +288,7 @@ public class GameRulesController : MonoBehaviour
                 previousLayerNeurons = childCar.neuralLayers[j].neurons;
             }
 
-            newCars.Add(childCar);
+            newCars.Add(childCar.DeepCopy());
         }
 
         return newCars;
