@@ -51,6 +51,19 @@ namespace Assets.Classes
             }
         }
 
+        public Layer DeepCopy()
+        {
+            Layer other = (Layer)this.MemberwiseClone();
+            other.neurons = new List<Neuron>();
+
+            foreach(Neuron neuron in neurons)
+            {
+                other.neurons.Add(neuron.DeepCopy());
+            }
+
+            return other;
+        }
+
         public List<List<float>> GetWeights()
         {
             List<List<float>> weights = new List<List<float>>();

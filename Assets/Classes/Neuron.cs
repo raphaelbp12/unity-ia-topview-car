@@ -19,6 +19,26 @@ namespace Assets.Classes
             calcActivationValue(input, neuronsPreviousLayer);
         }
 
+        public Neuron DeepCopy()
+        {
+            Neuron other = (Neuron)this.MemberwiseClone();
+            other.weights = new List<float>();
+            foreach (float weight in weights)
+            {
+                other.weights.Add(weight);
+            }
+
+            other.neuronsPreviousLayer = new List<Neuron>();
+            if(neuronsPreviousLayer.Count > 0)
+            {
+                foreach(Neuron neuron in neuronsPreviousLayer)
+                {
+                    other.neuronsPreviousLayer.Add(neuron.DeepCopy());
+                }
+            }
+            return other;
+        }
+
         public List<float> generateWeights(int weightsLength, List<float> receivedWeights)
         {
             if (receivedWeights.Count > 0)
@@ -56,6 +76,18 @@ namespace Assets.Classes
                 activationValue = value;
                 return value;
             }
+        }
+
+        public string GetWeightsToDebug()
+        {
+            string retorno = "";
+
+            foreach (float weight in weights)
+            {
+                retorno += ", " + weight;
+            }
+
+            return retorno;
         }
     }
 }
