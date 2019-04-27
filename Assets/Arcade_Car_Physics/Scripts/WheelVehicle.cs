@@ -451,6 +451,12 @@ namespace VehicleBehaviour {
             }
         }
 
+        public void DestroyMyself()
+        {
+            UnityEngine.Object.Destroy(_rb);
+            UnityEngine.Object.Destroy(gameObject);
+        }
+
         public float CalculateScore(float highestTravelledDist, float highestGoalDistance, float highestTicksOnCrash)
         {
             float relativeTravelledDist = (highestTravelledDist - distanceTravelled + 0.001f) / highestTravelledDist;

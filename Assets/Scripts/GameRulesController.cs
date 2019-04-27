@@ -16,6 +16,7 @@ public class GameRulesController : MonoBehaviour
     public GameObject spawnPoint;
     public Text text;
     public Text genText;
+    public Text remainingCarText;
 
     public int numCars = 10;
     private GameObject[] cars;
@@ -54,6 +55,7 @@ public class GameRulesController : MonoBehaviour
             text.text = "goalDistance " + newCars[activeCarIndex].goalDistance.ToString() + " " + "goalAngle " + newCars[activeCarIndex].goalAngle.ToString();
         }
 
+        remainingCarText.text = "Remaining Cars: " + newCars.Length;
         genText.text = "Generations: " + generations.ToString();
 
         if (newCars.Length > 0)
@@ -204,7 +206,7 @@ public class GameRulesController : MonoBehaviour
 
         for(int i = 0; i < numberOfParents; i++)
         {
-            carListProbabilities.Add(carsOrdered[i].DeepCopy());
+            carListProbabilities.Add(carsOrdered[i]);
         }
 
 
@@ -288,7 +290,7 @@ public class GameRulesController : MonoBehaviour
                 previousLayerNeurons = childCar.neuralLayers[j].neurons;
             }
 
-            newCars.Add(childCar.DeepCopy());
+            newCars.Add(childCar);
         }
 
         return newCars;
