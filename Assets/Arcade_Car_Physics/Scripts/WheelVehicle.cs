@@ -276,11 +276,6 @@ namespace VehicleBehaviour {
                 boost += Time.deltaTime * boostRegen;
                 if (boost > maxBoost) { boost = maxBoost; }
             }
-            GetCarOutputsToNeural();
-
-            CalcGameover();
-
-            NeuralNetwork();
         }
 
         void LateUpdate()
@@ -325,11 +320,11 @@ namespace VehicleBehaviour {
 
             result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(0, 0, 1)));
             result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(0, 0, -1)));
-            result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(0.5f, 0, 0.866f)));
-            result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(-0.5f, 0, 0.866f)));
+            result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(0.5f, 0, 0.866f))); // 30 degrees
+            result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(-0.5f, 0, 0.866f))); // 30 degrees
 
-            result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(0.9659f, 0, 0.2588f)));
-            result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(-0.9659f, 0, 0.2588f)));
+            result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(0.9659f, 0, 0.2588f))); // 15 degrees
+            result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(-0.9659f, 0, 0.2588f))); // 15 degrees
 
             //result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(-1, 0, 0)) / maxLaserDistance);
             //result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(1, 0, 0)) / maxLaserDistance);
@@ -459,11 +454,11 @@ namespace VehicleBehaviour {
 
         public float CalculateScore(float highestTravelledDist, float highestGoalDistance, float highestTicksOnCrash)
         {
-            float relativeTravelledDist = (highestTravelledDist - distanceTravelled + 0.001f) / highestTravelledDist;
+            float relativeTravelledDist = (highestTravelledDist - distanceTravelled + 0.1f) / highestTravelledDist;
 
             relativeGoalDistance = (highestGoalDistance - goalDistance + 0.001f) / highestGoalDistance;
 
-            float currentScore = (1.0f / relativeTravelledDist);
+            float currentScore = distanceTravelled;
 
             //if (hasCrashedOnWall)
             //{
@@ -678,6 +673,13 @@ namespace VehicleBehaviour {
             
             // Downforce
             _rb.AddForce(-transform.up * speed * downforce);
+
+
+            GetCarOutputsToNeural();
+
+            CalcGameover();
+
+            NeuralNetwork();
         }
 
         // Reposition the car to the start position

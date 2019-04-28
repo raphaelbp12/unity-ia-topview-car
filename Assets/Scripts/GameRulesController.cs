@@ -17,6 +17,8 @@ public class GameRulesController : MonoBehaviour
     public Text text;
     public Text genText;
     public Text remainingCarText;
+    public Slider gameSpeedSlider;
+    public Text gameSpeedText;
 
     public int numCars = 10;
     private GameObject[] cars;
@@ -30,6 +32,10 @@ public class GameRulesController : MonoBehaviour
     public float highestTicksOnCrash;
     public float highestSteering = 0;
     public float highestThrottle = 0;
+    public float currentHighestScore = 0;
+
+    public float gameSpeed = 1.0f;
+    public List<float> scoreHistory = new List<float>();
 
     public int numberOfParents = 20;
 
@@ -40,6 +46,7 @@ public class GameRulesController : MonoBehaviour
     // This script will simply instantiate the Prefab when the game starts.
     void Start()
     {
+        Time.timeScale = gameSpeed;
         GenerateCars(new List<WheelVehicle>());
     }
 
@@ -57,6 +64,7 @@ public class GameRulesController : MonoBehaviour
 
         remainingCarText.text = "Remaining Cars: " + newCars.Length;
         genText.text = "Generations: " + generations.ToString();
+        gameSpeedText.text = "Game Speed: " + gameSpeed;
 
         if (newCars.Length > 0)
         {
@@ -98,6 +106,12 @@ public class GameRulesController : MonoBehaviour
         }
     }
 
+    public void ChangeGameSpeed()
+    {
+        gameSpeed = gameSpeedSlider.value;
+        Time.timeScale = gameSpeed;
+    }
+
     void SelectCarToCamera(List<WheelVehicle> newCars)
     {
         if (newCars.Count > 0)
@@ -122,6 +136,7 @@ public class GameRulesController : MonoBehaviour
     void GenerateCars(List<WheelVehicle> newCars)
     {
         generations += 1;
+        scoreHistory.Add(currentHighestScore);
         thisGenerationCars = new List<WheelVehicle>();
         cars = new GameObject[numCars];
         carsOrdered = new List<WheelVehicle>();
@@ -191,6 +206,8 @@ public class GameRulesController : MonoBehaviour
             if (thisCarScore > highestScore)
                 highestScore = thisCarScore;
         }
+
+        currentHighestScore = highestScore;
 
         carsOrdered = thisGenerationCars.ToList().OrderByDescending(o => o.score).ToList();
 
