@@ -29,6 +29,7 @@ public class GameRulesController : MonoBehaviour
 
     public float highestTravelledDist;
     public float highestGoalDistance;
+    public float highestMeanVelInTicks;
     public float highestTicksOnCrash;
     public float highestSteering = 0;
     public float highestThrottle = 0;
@@ -43,6 +44,9 @@ public class GameRulesController : MonoBehaviour
 
     private List<List<WheelVehicle>> carsHistory = new List<List<WheelVehicle>>();
 
+    public int ticks = 0;
+    public int ticksIntervalCalcCamera = 20;
+
     // This script will simply instantiate the Prefab when the game starts.
     void Start()
     {
@@ -50,12 +54,13 @@ public class GameRulesController : MonoBehaviour
         GenerateCars(new List<WheelVehicle>());
     }
 
-    void FixedUpdate()
+    void Update()
     {
     }
 
-    void Update()
+    void FixedUpdate()
     {
+        ticks += 1;
         WheelVehicle[] newCars = FindObjectsOfType<WheelVehicle>();
         if (activeCarIndex < newCars.Length)
         {
@@ -68,9 +73,12 @@ public class GameRulesController : MonoBehaviour
 
         if (newCars.Length > 0)
         {
+            if (ticks % ticksIntervalCalcCamera != 0)
+                return;
             highestTravelledDist = newCars[0].distanceTravelled;
             highestGoalDistance = 0.0f;
             highestTicksOnCrash = 0.0f;
+            highestMeanVelInTicks = 0.0f;
 
             foreach (WheelVehicle car in newCars)
             {
@@ -84,16 +92,16 @@ public class GameRulesController : MonoBehaviour
                     highestGoalDistance = car.goalDistance;
                 }
 
-                if (car.ticksOnCrash > highestTicksOnCrash)
+                if (car.meanVelInTicks > highestMeanVelInTicks)
                 {
-                    highestTicksOnCrash = car.ticksOnCrash;
+                    highestMeanVelInTicks = car.meanVelInTicks;
                 }
             }
 
 
             foreach (WheelVehicle car in newCars)
             {
-                float score = car.CalculateScore(highestTravelledDist, highestGoalDistance, highestTicksOnCrash);
+                float score = car.CalculateScore(highestTravelledDist, highestMeanVelInTicks);
             }
 
             carsOrdered = newCars.ToList().OrderByDescending(o => o.score).ToList();
@@ -147,6 +155,7 @@ public class GameRulesController : MonoBehaviour
             WheelVehicle carComp = new WheelVehicle();
 
             carComp = car.GetComponent<WheelVehicle>();
+            carComp.gameSpeed = gameSpeed;
 
             if (newCars.Count > 0)
             {
@@ -196,11 +205,16 @@ public class GameRulesController : MonoBehaviour
             {
                 highestThrottle = car.maxThrottle;
             }
+
+            if (car.meanVelInTicks > highestMeanVelInTicks)
+            {
+                highestMeanVelInTicks = car.meanVelInTicks;
+            }
         }
 
         foreach (WheelVehicle car in thisGenerationCars)
         {
-            car.CalculateScore(highestTravelledDist, highestGoalDistance, highestTicksOnCrash);
+            car.CalculateScore(highestTravelledDist, highestMeanVelInTicks);
             float thisCarScore = car.score;
 
             if (thisCarScore > highestScore)

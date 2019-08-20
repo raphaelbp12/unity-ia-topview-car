@@ -4552,7 +4552,7 @@ MonoBehaviour:
   remainingCarText: {fileID: 1003187577}
   gameSpeedSlider: {fileID: 479332790}
   gameSpeedText: {fileID: 1046456796}
-  numCars: 100
+  numCars: 150
   carsOrdered: []
   thisGenerationCars: []
   highestTravelledDist: 0
@@ -4565,6 +4565,8 @@ MonoBehaviour:
   scoreHistory: []
   numberOfParents: 20
   mutationProbability: 1
+  ticks: 0
+  ticksIntervalCalcCamera: 20
 --- !u!4 &900292624
 Transform:
   m_ObjectHideFlags: 0

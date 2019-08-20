@@ -197,6 +197,7 @@ namespace VehicleBehaviour {
         public int maxLifeTimeSec = 25;
         public int minLifeTimeSec = 5;
         public float meanVel = 50;
+        public float meanVelInTicks = 0;
         public float minMeanVel = 0.04f;
         public float minInstantVel = 0.04f;
         public float goalDistance;
@@ -215,6 +216,8 @@ namespace VehicleBehaviour {
         public float realTime = 0;
 
         public string carName = "";
+
+        public float gameSpeed = 1;
 
         public List<Layer> neuralLayers = new List<Layer>();
         public List<Layer> parentLayers = new List<Layer>();
@@ -265,6 +268,7 @@ namespace VehicleBehaviour {
         {
             distanceTravelled += Vector3.Distance(transform.position, lastPosition);
             lastPosition = transform.position;
+            meanVelInTicks = distanceTravelled / ticks;
             foreach (ParticleSystem gasParticle in gasParticles)
             {
                 gasParticle.Play();
@@ -452,11 +456,23 @@ namespace VehicleBehaviour {
             UnityEngine.Object.Destroy(gameObject);
         }
 
-        public float CalculateScore(float highestTravelledDist, float highestGoalDistance, float highestTicksOnCrash)
+        public float CalculateScore(float highestTravelledDist, float highestMeanVelInTicks)
         {
-            float relativeTravelledDist = (highestTravelledDist - distanceTravelled + 0.1f) / highestTravelledDist;
+            float normalizedTravelledDist = (highestTravelledDist - distanceTravelled + 0.000001f) / highestTravelledDist;
 
-            relativeGoalDistance = (highestGoalDistance - goalDistance + 0.001f) / highestGoalDistance;
+            if(highestTravelledDist == distanceTravelled)
+            {
+                normalizedTravelledDist = 1.0f;
+            }
+
+            float normalizedMeanVel = (highestMeanVelInTicks - meanVelInTicks + 0.000001f) / highestMeanVelInTicks;
+
+            if (highestMeanVelInTicks == meanVelInTicks)
+            {
+                normalizedMeanVel = 1.0f;
+            }
+
+            //relativeGoalDistance = (highestGoalDistance - goalDistance + 0.001f) / highestGoalDistance;
 
             float currentScore = distanceTravelled;
 
@@ -465,10 +481,10 @@ namespace VehicleBehaviour {
             //    currentScore = 0;
             //}
 
-            if (checkpointsReached > 0)
-            {
-                currentScore = currentScore * checkpointsReached * 20;
-            }
+            //if (checkpointsReached > 0)
+            //{
+            //    currentScore = currentScore * checkpointsReached * 20;
+            //}
 
             score = currentScore;
             return currentScore;
@@ -675,9 +691,13 @@ namespace VehicleBehaviour {
             _rb.AddForce(-transform.up * speed * downforce);
 
 
-            GetCarOutputsToNeural();
 
             CalcGameover();
+
+            if (gameSpeed > 1 && ticks % (2 * gameSpeed) != 0)
+                return;
+
+            GetCarOutputsToNeural();
 
             NeuralNetwork();
         }
