@@ -1742,6 +1742,85 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fceced77a472dda4d9814a2201eb2c18, type: 3}
+--- !u!1001 &273748964
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 6762936429033320200, guid: 5b542724ed3cff447a510d82ddf515b0,
+        type: 3}
+      propertyPath: m_Name
+      value: Unicycle
+      objectReference: {fileID: 0}
+    - target: {fileID: 8136665419063362241, guid: 5b542724ed3cff447a510d82ddf515b0,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8136665419063362241, guid: 5b542724ed3cff447a510d82ddf515b0,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.157
+      objectReference: {fileID: 0}
+    - target: {fileID: 8136665419063362241, guid: 5b542724ed3cff447a510d82ddf515b0,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8136665419063362241, guid: 5b542724ed3cff447a510d82ddf515b0,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8136665419063362241, guid: 5b542724ed3cff447a510d82ddf515b0,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8136665419063362241, guid: 5b542724ed3cff447a510d82ddf515b0,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8136665419063362241, guid: 5b542724ed3cff447a510d82ddf515b0,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8136665419063362241, guid: 5b542724ed3cff447a510d82ddf515b0,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 8136665419063362241, guid: 5b542724ed3cff447a510d82ddf515b0,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8136665419063362241, guid: 5b542724ed3cff447a510d82ddf515b0,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8136665419063362241, guid: 5b542724ed3cff447a510d82ddf515b0,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4304684861179825591, guid: 5b542724ed3cff447a510d82ddf515b0,
+        type: 3}
+      propertyPath: m_Constraints
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8666187473547497114, guid: 5b542724ed3cff447a510d82ddf515b0,
+        type: 3}
+      propertyPath: m_Constraints
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 5b542724ed3cff447a510d82ddf515b0, type: 3}
 --- !u!1001 &280990494
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4552,11 +4631,12 @@ MonoBehaviour:
   remainingCarText: {fileID: 1003187577}
   gameSpeedSlider: {fileID: 479332790}
   gameSpeedText: {fileID: 1046456796}
-  numCars: 150
+  numCars: 0
   carsOrdered: []
   thisGenerationCars: []
   highestTravelledDist: 0
   highestGoalDistance: 0
+  highestMeanVelInTicks: 0
   highestTicksOnCrash: 0
   highestSteering: 0
   highestThrottle: 0
