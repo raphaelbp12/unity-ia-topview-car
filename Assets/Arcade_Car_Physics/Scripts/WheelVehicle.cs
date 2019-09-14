@@ -316,8 +316,11 @@ namespace VehicleBehaviour {
 
             //Debug.Log("velocidade " + linearVel + " angular " + angVel);
 
-            result.Add(linearVel / 34.96f);
-            result.Add(angVel / 6.0f);
+            float maxLinearVelPoss = 34.96f;
+            float maxAngVelPoss = 6.0f;
+
+            result.Add(linearVel / maxLinearVelPoss);
+            result.Add(angVel / maxAngVelPoss);
 
             //result.Add(goalDistance);
             //result.Add(goalAngle);
@@ -697,7 +700,7 @@ namespace VehicleBehaviour {
             if (gameSpeed > 1 && ticks % (2 * gameSpeed) != 0)
                 return;
 
-            GetCarOutputsToNeural();
+            // GetCarOutputsToNeural();
 
             NeuralNetwork();
         }

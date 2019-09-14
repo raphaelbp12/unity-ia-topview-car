@@ -48,9 +48,12 @@ public class UnicycleController : MonoBehaviour
 
         leftWheel.brakeTorque = 0;
         rightWheel.brakeTorque = 0;
+
+        float throttleLeft = (throttle + steering) / 2;
+        float throttleRight = (throttle - steering) / 2;
         
-        leftWheel.motorTorque = throttle * diffGearing;
-        rightWheel.motorTorque = throttle * diffGearing;
+        leftWheel.motorTorque = throttleLeft * diffGearing;
+        rightWheel.motorTorque = throttleRight * diffGearing;
 
         // _rb.AddForce(-transform.up * speed * downforce);
     }
