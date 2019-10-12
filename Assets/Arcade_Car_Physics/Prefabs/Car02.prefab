@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 146014540103652148}
   - component: {fileID: 114507247422366396}
   - component: {fileID: 114822347051870414}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: FLWheel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -110,7 +110,7 @@ GameObject:
   - component: {fileID: 4616151917948992}
   - component: {fileID: 33240038841552762}
   - component: {fileID: 23689876034443104}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: wheel_smallSports_45
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -189,7 +189,7 @@ GameObject:
   - component: {fileID: 146802126822764044}
   - component: {fileID: 114526905319013540}
   - component: {fileID: 114783648448176536}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: FRWheel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -285,7 +285,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4629044809684432}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -322,7 +322,7 @@ GameObject:
   - component: {fileID: 33240498175066368}
   - component: {fileID: 23879541751871942}
   - component: {fileID: 64563664088639640}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: trunk_default_51
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -417,7 +417,7 @@ GameObject:
   - component: {fileID: 33251417388465388}
   - component: {fileID: 23219888741776158}
   - component: {fileID: 64139599982517820}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: windshield_default_53
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -512,7 +512,7 @@ GameObject:
   - component: {fileID: 146793865263719070}
   - component: {fileID: 114341878329182152}
   - component: {fileID: 114303260965533220}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: BLWheel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -610,7 +610,7 @@ GameObject:
   - component: {fileID: 4079527284605248}
   - component: {fileID: 33528078060324650}
   - component: {fileID: 23319507113374050}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: wheel_smallSports_45
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -686,7 +686,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4688843054088998}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: CenterOfMass
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -719,7 +719,7 @@ GameObject:
   - component: {fileID: 33499260255564218}
   - component: {fileID: 23887599439215412}
   - component: {fileID: 64724056045730398}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: hood_sport_52
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -815,7 +815,7 @@ GameObject:
   - component: {fileID: 114064628577781280}
   - component: {fileID: 82875422344952318}
   - component: {fileID: 82884678253985140}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: Car02
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -957,6 +957,8 @@ MonoBehaviour:
   driftIntensity: 1.3
   centerOfMass: {fileID: 4688843054088998}
   downforce: 8
+  steering: 5.2521544
+  throttle: -0.2420601
   handbrake: 0
   allowDrift: 1
   speed: 0
@@ -1192,7 +1194,7 @@ GameObject:
   - component: {fileID: 4978630911698712}
   - component: {fileID: 33607802808519220}
   - component: {fileID: 23825783724415624}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: wheel_smallSports_45
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1270,7 +1272,7 @@ GameObject:
   - component: {fileID: 4799495039464946}
   - component: {fileID: 33905518040494060}
   - component: {fileID: 23645620612310484}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: wheel_smallSports_45
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1349,7 +1351,7 @@ GameObject:
   - component: {fileID: 33468058988107782}
   - component: {fileID: 23913165399862224}
   - component: {fileID: 64988439519252148}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: detail_spoilerSmall_55
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1441,7 +1443,7 @@ GameObject:
   - component: {fileID: 146504509095465980}
   - component: {fileID: 114800290297643028}
   - component: {fileID: 114649827415014558}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: BRWheel
   m_TagString: Untagged
   m_Icon: {fileID: 0}

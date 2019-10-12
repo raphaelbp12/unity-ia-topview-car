@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class UnicycleController : MonoBehaviour
 {
+    public NeuralNetwork parentNeuralNetwork;
+
     [SerializeField] WheelCollider leftWheel;
     [SerializeField] WheelCollider rightWheel;
     [SerializeField] Transform centerOfMass;
@@ -14,8 +16,8 @@ public class UnicycleController : MonoBehaviour
     [Range(0.5f, 10f)]
     [SerializeField] float downforce = 1.0f;
 
-    [SerializeField] float throttle;
-    [SerializeField] float steering;
+    [SerializeField] public float throttle = 0.0f;
+    [SerializeField] public float steering = 0.0f;
 
     [Range(2, 1000)]
     [SerializeField] float diffGearing = 1000.0f;
@@ -43,11 +45,13 @@ public class UnicycleController : MonoBehaviour
     {
         speed = transform.InverseTransformDirection(_rb.velocity).z * 3.6f;
 
-        throttle = Input.GetAxis("Vertical");
-        steering = Input.GetAxis("Horizontal");
+        //throttle = Input.GetAxis("Vertical");
+        //steering = Input.GetAxis("Horizontal");
 
         leftWheel.brakeTorque = 0;
         rightWheel.brakeTorque = 0;
+
+        throttle = throttle * 10;
 
         float throttleLeft = (throttle + steering) / 2;
         float throttleRight = (throttle - steering) / 2;
@@ -62,5 +66,13 @@ public class UnicycleController : MonoBehaviour
     {
         UnityEngine.Object.Destroy(_rb);
         UnityEngine.Object.Destroy(gameObject);
+    }
+
+    void OnTriggerEnter(Collider aCol)
+    {
+        if (parentNeuralNetwork != null)
+        {
+            parentNeuralNetwork.OnChildTriggerEnter(aCol);
+        }
     }
 }
