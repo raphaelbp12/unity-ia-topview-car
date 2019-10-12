@@ -56,10 +56,10 @@ WheelCollider:
     m_Stiffness: 1
   m_SidewaysFriction:
     m_ExtremumSlip: 0.2
-    m_ExtremumValue: 1
-    m_AsymptoteSlip: 0.5
-    m_AsymptoteValue: 0.75
-    m_Stiffness: 1
+    m_ExtremumValue: 0.4
+    m_AsymptoteSlip: 0.1
+    m_AsymptoteValue: 0.3
+    m_Stiffness: 5
   m_Enabled: 1
 --- !u!1 &1592744345743987603
 GameObject:
@@ -300,10 +300,10 @@ WheelCollider:
     m_Stiffness: 1
   m_SidewaysFriction:
     m_ExtremumSlip: 0.2
-    m_ExtremumValue: 1
-    m_AsymptoteSlip: 0.5
-    m_AsymptoteValue: 0.75
-    m_Stiffness: 1
+    m_ExtremumValue: 0.4
+    m_AsymptoteSlip: 0.1
+    m_AsymptoteValue: 0.3
+    m_Stiffness: 5
   m_Enabled: 1
 --- !u!1 &6762936429033320200
 GameObject:
@@ -352,6 +352,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f11524716c1f5b444a862d0d3eb90e0d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  parentNeuralNetwork: {fileID: 0}
   leftWheel: {fileID: 6677684587578740562}
   rightWheel: {fileID: 7048531238537650029}
   centerOfMass: {fileID: 1836434560044810415}
