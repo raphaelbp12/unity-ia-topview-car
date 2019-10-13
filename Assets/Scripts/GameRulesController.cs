@@ -47,6 +47,8 @@ public class GameRulesController : MonoBehaviour
     public int ticks = 0;
     public int ticksIntervalCalcCamera = 20;
 
+    [SerializeField] List<WallMover> movingWalls;
+
     // This script will simply instantiate the Prefab when the game starts.
     void Start()
     {
@@ -110,6 +112,10 @@ public class GameRulesController : MonoBehaviour
             SelectCarToCamera(carsOrdered);
         } else
         {
+            foreach (WallMover wall in movingWalls)
+            {
+                wall.restartMovement();
+            }
             NaturalSelection();
         }
     }
