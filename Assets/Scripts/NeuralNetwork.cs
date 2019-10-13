@@ -47,7 +47,7 @@ public class NeuralNetwork : MonoBehaviour
     private int maxLifeTimeSec = 2500;
     private int minLifeTimeSec = 500;
     private float minDistAllowed = 10;
-    private float minDistInLastTimeAllowed = 2;
+    private float minDistInLastTimeAllowed = 5;
 
     public float meanVelInTicks = 0;
     public int ticks = 0;
@@ -220,11 +220,11 @@ public class NeuralNetwork : MonoBehaviour
         newLayers.Add(firstLayer);
 
         List<List<float>> firstLayerWeights = neuralLayers.Count > 1 ? neuralLayers[1].GetWeights() : new List<List<float>>();
-        Layer secondLayer = new Layer(new List<float>(), 7, firstLayer.neurons, firstLayerWeights);
+        Layer secondLayer = new Layer(new List<float>(), 4, firstLayer.neurons, firstLayerWeights);
         newLayers.Add(secondLayer);
 
         List<List<float>> secondLayerWeights = neuralLayers.Count > 2 ? neuralLayers[2].GetWeights() : new List<List<float>>();
-        Layer thirdLayer = new Layer(new List<float>(), 5, secondLayer.neurons, secondLayerWeights);
+        Layer thirdLayer = new Layer(new List<float>(), 4, secondLayer.neurons, secondLayerWeights);
         newLayers.Add(thirdLayer);
 
         List<List<float>> thirdLayerWeights = neuralLayers.Count > 3 ? neuralLayers[3].GetWeights() : new List<List<float>>();

@@ -41,6 +41,8 @@ public class GameRulesController : MonoBehaviour
     public int numberOfParents = 20;
 
     public float mutationProbability = 0.1f;
+    public int numberOfMutations = 2;
+    public int numNeuralInputs = 8;
 
     private List<List<NeuralNetwork>> carsHistory = new List<List<NeuralNetwork>>();
 
@@ -284,7 +286,7 @@ public class GameRulesController : MonoBehaviour
             List<Neuron> fatherGenome = carListProbabilities[carFatherIndex].GetGenome();
 
 
-            int crossOverPoint = UnityEngine.Mathf.FloorToInt(UnityEngine.Random.Range(0.0f, 1.0f) * motherGenome.Count);
+            int crossOverPoint = UnityEngine.Mathf.FloorToInt(UnityEngine.Random.Range(0.0f, 1.0f) * (motherGenome.Count - numNeuralInputs)) + numNeuralInputs;
 
             List<Neuron> resultGenome = motherGenome.Take(crossOverPoint).Concat(fatherGenome.Skip(crossOverPoint)).ToList();
             List<Neuron> childrenGenome = new List<Neuron>();
@@ -293,12 +295,20 @@ public class GameRulesController : MonoBehaviour
                 childrenGenome.Add(neuron.DeepCopy());
             }
 
-            int mutationPoint = UnityEngine.Mathf.FloorToInt(UnityEngine.Random.Range(0.0f, 1.0f) * childrenGenome.Count);
+            List<int> mutationPoints = new List<int>();
 
-            if (UnityEngine.Random.Range(0.0f, 1.0f) < mutationProbability)
+            for (int j = 0; j < numberOfMutations; j++)
             {
-                int numWeights = childrenGenome[mutationPoint].weights.Count();
-                childrenGenome[mutationPoint].generateWeights(numWeights, new List<float>());
+                mutationPoints.Add(UnityEngine.Mathf.FloorToInt(UnityEngine.Random.Range(0.0f, 1.0f) * (childrenGenome.Count - numNeuralInputs)) + numNeuralInputs);
+            }
+
+            foreach (int mutationPoint in mutationPoints)
+            {
+                if (UnityEngine.Random.Range(0.0f, 1.0f) < mutationProbability)
+                {
+                    int numWeights = childrenGenome[mutationPoint].weights.Count();
+                    childrenGenome[mutationPoint].generateWeights(numWeights, new List<float>());
+                }
             }
 
             NeuralNetwork childCar = new NeuralNetwork();

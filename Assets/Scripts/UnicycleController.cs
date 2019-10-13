@@ -51,7 +51,7 @@ public class UnicycleController : MonoBehaviour
         leftWheel.brakeTorque = 0;
         rightWheel.brakeTorque = 0;
 
-        throttle = throttle * 5;
+        throttle = throttle * 10;
         steering = steering * 1;
 
         float throttleLeft = (throttle + steering) / 2;
