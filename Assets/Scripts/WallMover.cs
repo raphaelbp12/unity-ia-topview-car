@@ -8,7 +8,7 @@ public class WallMover : MonoBehaviour
     [SerializeField] WallPath wallPath;
     [SerializeField] float waypointTolerance = 1f;
     [SerializeField] float speed = 1f;
-    int currentWaypointIndex;
+    public int currentWaypointIndex;
 
     private void Start()
     {
@@ -53,7 +53,7 @@ public class WallMover : MonoBehaviour
     private Vector3 GetCurrentWaypoint()
     {
         return wallPath.GetWaypoint(currentWaypointIndex);
-}
+    }
 
     private void CycleWaypoint()
     {
