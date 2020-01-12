@@ -34,3 +34,9 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
+
+projeto_Data
+.directory
+.vscode/launch.json
+*.x86_64
+*.deb

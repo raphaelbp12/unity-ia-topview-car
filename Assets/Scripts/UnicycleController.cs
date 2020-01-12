@@ -19,8 +19,8 @@ public class UnicycleController : MonoBehaviour
     [SerializeField] public float throttle = 0.0f;
     [SerializeField] public float steering = 0.0f;
 
-    [Range(2, 1000)]
-    [SerializeField] float diffGearing = 1000.0f;
+    [Range(2, 10000)]
+    [SerializeField] float diffGearing = 2000.0f;
 
     Rigidbody _rb;
 

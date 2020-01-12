@@ -4933,7 +4933,7 @@ MonoBehaviour:
   remainingCarText: {fileID: 1003187577}
   gameSpeedSlider: {fileID: 479332790}
   gameSpeedText: {fileID: 1046456796}
-  numCars: 150
+  numCars: 100
   carsOrdered: []
   thisGenerationCars: []
   highestTravelledDist: 0
@@ -4945,13 +4945,14 @@ MonoBehaviour:
   currentHighestScore: 0
   gameSpeed: 1
   scoreHistory: []
-  numberOfParents: 2
-  mutationProbability: 0.7
+  numberOfParents: 20
+  mutationProbability: 1
   numberOfMutations: 2
   numNeuralInputs: 8
   ticks: 0
   ticksIntervalCalcCamera: 20
-  movingWalls: []
+  movingWalls:
+  - {fileID: 1500337942}
 --- !u!4 &900292624
 Transform:
   m_ObjectHideFlags: 0
@@ -8098,7 +8099,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   wallPath: {fileID: 308889196}
   waypointTolerance: 1
-  speed: 0.5
+  speed: 0.4
   currentWaypointIndex: 0
 --- !u!65 &1500337943
 BoxCollider:
