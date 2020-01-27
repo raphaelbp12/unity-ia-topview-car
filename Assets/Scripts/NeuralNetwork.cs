@@ -41,7 +41,7 @@ public class NeuralNetwork : MonoBehaviour
     private float distanceInLastTime = 0.0f;
 
 
-    private float minValidDistanceIncrement = 0.05f;
+    private float minValidDistanceIncrement = 0.005f;
     private float minMeanVel = 0.04f;
     private float minInstantVel = 0.04f;
     private int maxLifeTimeSec = 2500;
@@ -94,7 +94,7 @@ public class NeuralNetwork : MonoBehaviour
             ticksWithMinDistanceValid = ticksWithMinDistanceValid + 1;
         }
         lastPosition = carGO.transform.position;
-        meanVelInTicks = distanceTravelled / (ticks - ticksWithMinDistanceValid);
+        meanVelInTicks = distanceTravelled / (ticks);
 
         CalcGameover();
 
@@ -219,23 +219,23 @@ public class NeuralNetwork : MonoBehaviour
         Layer firstLayer = new Layer(neuralInputs, neuralInputs.Count, new List<Neuron>(), new List<List<float>>());
         newLayers.Add(firstLayer);
 
-        List<List<float>> firstLayerWeights = neuralLayers.Count > 1 ? neuralLayers[1].GetWeights() : new List<List<float>>();
-        Layer secondLayer = new Layer(new List<float>(), 4, firstLayer.neurons, firstLayerWeights);
+        List<List<float>> pastSecondLayerWeights = neuralLayers.Count > 1 ? neuralLayers[1].GetWeights() : new List<List<float>>();
+        Layer secondLayer = new Layer(new List<float>(), 4, firstLayer.neurons, pastSecondLayerWeights);
         newLayers.Add(secondLayer);
 
-        List<List<float>> secondLayerWeights = neuralLayers.Count > 2 ? neuralLayers[2].GetWeights() : new List<List<float>>();
-        Layer thirdLayer = new Layer(new List<float>(), 4, secondLayer.neurons, secondLayerWeights);
+        List<List<float>> pastThirdLayerWeights = neuralLayers.Count > 2 ? neuralLayers[2].GetWeights() : new List<List<float>>();
+        Layer thirdLayer = new Layer(new List<float>(), 4, secondLayer.neurons, pastThirdLayerWeights);
         newLayers.Add(thirdLayer);
 
-        List<List<float>> thirdLayerWeights = neuralLayers.Count > 3 ? neuralLayers[3].GetWeights() : new List<List<float>>();
-        Layer fourthLayer = new Layer(new List<float>(), 2, thirdLayer.neurons, thirdLayerWeights);
+        List<List<float>> pastFourthLayerWeights = neuralLayers.Count > 3 ? neuralLayers[3].GetWeights() : new List<List<float>>();
+        Layer fourthLayer = new Layer(new List<float>(), 2, thirdLayer.neurons, pastFourthLayerWeights);
         newLayers.Add(fourthLayer);
 
         List<float> vels = fourthLayer.GetOutputs();
 
         if (vels.Count > 0)
         {
-            randomThrottle = vels[0];
+            randomThrottle = vels[0] * 2;
             randomSteering = vels[1];
 
             //randomThrottle = 10;
@@ -250,7 +250,7 @@ public class NeuralNetwork : MonoBehaviour
             if (Math.Abs(randomThrottle) > Math.Abs(maxThrottle))
                 maxThrottle = randomThrottle;
 
-            randomSteering = randomSteering * 25;
+            randomSteering = randomSteering * 1;
 
             carGO.GetComponent<UnicycleController>().throttle = randomThrottle;
             carGO.GetComponent<UnicycleController>().steering = randomSteering;
@@ -337,16 +337,16 @@ public class NeuralNetwork : MonoBehaviour
             normalizedTravelledDist = 1.0f;
         }
 
-        float normalizedMeanVel = (highestMeanVelInTicks - meanVelInTicks + 0.000001f) / highestMeanVelInTicks;
+        // float normalizedMeanVel = (highestMeanVelInTicks - meanVelInTicks + 0.000001f) / highestMeanVelInTicks;
 
-        if (highestMeanVelInTicks == meanVelInTicks)
-        {
-            normalizedMeanVel = 1.0f;
-        }
+        // if (highestMeanVelInTicks == meanVelInTicks)
+        // {
+        //     normalizedMeanVel = 1.0f;
+        // }
 
         //relativeGoalDistance = (highestGoalDistance - goalDistance + 0.001f) / highestGoalDistance;
 
-        float currentScore = meanVelInTicks;
+        float currentScore = normalizedTravelledDist;
 
         if (ticksWithMinDistanceValid == 0)
         {

@@ -52,10 +52,14 @@ namespace Assets.Classes
                 {
                     float random = UnityEngine.Random.Range(-1.0f, 1.0f);
                     float randomNormalized = random / neuronsPreviousLayer.Count;
-                    weights.Add(randomNormalized);
+                    weights.Add(random);
                 }
                 return weights;
             }
+        }
+
+        public static float Sigmoid(double value) {
+            return 1.0f / (1.0f + (float) Math.Exp(-value));
         }
 
         public float calcActivationValue(float? input, List<Neuron> previousNeurons)
@@ -73,8 +77,8 @@ namespace Assets.Classes
                     value = value + neuronsPreviousLayer[i].activationValue * weights[i];
                 }
 
-                activationValue = value;
-                return value;
+                activationValue = (float)Sigmoid(value) - 0.5f;
+                return activationValue;
             }
         }
 

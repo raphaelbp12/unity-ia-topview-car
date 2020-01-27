@@ -4945,7 +4945,7 @@ MonoBehaviour:
   currentHighestScore: 0
   gameSpeed: 1
   scoreHistory: []
-  numberOfParents: 20
+  numberOfParents: 4
   mutationProbability: 1
   numberOfMutations: 2
   numNeuralInputs: 8
@@ -8099,7 +8099,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   wallPath: {fileID: 308889196}
   waypointTolerance: 1
-  speed: 0.4
+  speed: 0.125
   currentWaypointIndex: 0
 --- !u!65 &1500337943
 BoxCollider:

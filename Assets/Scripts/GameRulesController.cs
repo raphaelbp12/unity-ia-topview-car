@@ -151,13 +151,15 @@ public class GameRulesController : MonoBehaviour
 
     void GenerateCars(List<NeuralNetwork> newCars)
     {
+        int realCarNumber = newCars.Count > 0 ? newCars.Count : numCars*2;
         generations += 1;
         scoreHistory.Add(currentHighestScore);
         thisGenerationCars = new List<NeuralNetwork>();
-        cars = new GameObject[numCars];
+        cars = new GameObject[realCarNumber];
         carsOrdered = new List<NeuralNetwork>();
+
         // Instantiate at position (0, 0, 0) and zero rotation.
-        for (int i = 0; i < numCars; i++)
+        for (int i = 0; i < realCarNumber; i++)
         {
             GameObject car = Instantiate(myPrefab, spawnPoint.transform.position, Quaternion.identity);
             NeuralNetwork carComp = new NeuralNetwork();
@@ -248,6 +250,11 @@ public class GameRulesController : MonoBehaviour
             carListProbabilities.Add(carsOrdered[i]);
         }
 
+        for(int i = (numCars - 1); i > (numCars - numberOfParents - 1); i--)
+        {
+            carListProbabilities.Add(carsOrdered[i]);
+        }
+
 
         List<NeuralNetwork> newCars = new List<NeuralNetwork>();
 
@@ -255,7 +262,19 @@ public class GameRulesController : MonoBehaviour
         {
             newCars.Add(carsOrdered[0].DeepCopy());
             newCars.Add(carsOrdered[1].DeepCopy());
-            newCars.AddRange(CrossOver(carListProbabilities, numCars - 2));
+            newCars.Add(carsOrdered[numCars - 1].DeepCopy());
+            newCars.Add(carsOrdered[numCars - 2].DeepCopy());
+            newCars.AddRange(CrossOver(carListProbabilities, numCars - 4));
+
+            NeuralNetwork emptyCar = carsOrdered[0].DeepCopy();
+            emptyCar.parentLayers = new List<Layer>();
+            emptyCar.neuralLayers = new List<Layer>();
+
+            for(int i = 0; i < numCars; i++)
+            {
+                newCars.Add(emptyCar.DeepCopy());
+            }
+
             carsHistory.Add(carsOrdered);
             carsOrdered = new List<NeuralNetwork>();
         }
