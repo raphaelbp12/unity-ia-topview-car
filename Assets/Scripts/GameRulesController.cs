@@ -10,10 +10,12 @@ public class GameRulesController : MonoBehaviour
 {
     // Reference to the Prefab. Drag a Prefab into this field in the Inspector.
 
+    public int trackCount = 3;
     public int generations = 0;
     public GameObject myPrefab;
     public GameObject camera;
-    public GameObject spawnPoint;
+    public List<GameObject> spawnPoints;
+    public int currentSpawnPoint = 0;
     public Text text;
     public Text genText;
     public Text remainingCarText;
@@ -27,9 +29,10 @@ public class GameRulesController : MonoBehaviour
     public List<NeuralNetwork> carsOrdered;
     public List<NeuralNetwork> thisGenerationCars;
 
-    public float highestTravelledDist;
+    public float highestTravelledDist = 0f;
+    public List<float> highestTravelledDistByTrack;
     public float highestGoalDistance;
-    public float highestMeanVelInTicks;
+    public float highestMeanVelInTicks = 0f;
     public float highestTicksOnCrash;
     public float highestSteering = 0;
     public float highestThrottle = 0;
@@ -49,11 +52,17 @@ public class GameRulesController : MonoBehaviour
     public int ticks = 0;
     public int ticksIntervalCalcCamera = 20;
 
+    private NeuralNetwork bestCurrentCar;
+
     [SerializeField] List<WallMover> movingWalls;
 
     // This script will simply instantiate the Prefab when the game starts.
     void Start()
     {
+        for (int i = 0; i < trackCount; i++)
+        {
+            highestTravelledDistByTrack.Add(0f);
+        }
         Time.timeScale = gameSpeed;
         GenerateCars(new List<NeuralNetwork>());
     }
@@ -79,10 +88,6 @@ public class GameRulesController : MonoBehaviour
         {
             if (ticks % ticksIntervalCalcCamera != 0)
                 return;
-            highestTravelledDist = newCars[0].distanceTravelled;
-            highestGoalDistance = 0.0f;
-            highestTicksOnCrash = 0.0f;
-            highestMeanVelInTicks = 0.0f;
 
             foreach (NeuralNetwork car in newCars)
             {
@@ -105,7 +110,7 @@ public class GameRulesController : MonoBehaviour
 
             foreach (NeuralNetwork car in newCars)
             {
-                float score = car.CalculateScore(highestTravelledDist, highestMeanVelInTicks);
+                float score = car.CalculateScore(highestTravelledDist, highestMeanVelInTicks, currentSpawnPoint);
             }
 
             carsOrdered = newCars.ToList().OrderByDescending(o => o.score).ToList();
@@ -114,11 +119,29 @@ public class GameRulesController : MonoBehaviour
             SelectCarToCamera(carsOrdered);
         } else
         {
-            foreach (WallMover wall in movingWalls)
-            {
-                wall.restartMovement();
-            }
+            PrepareNextTrack();
+        }
+    }
+
+    void PrepareNextTrack()
+    {
+        foreach (WallMover wall in movingWalls)
+        {
+            wall.restartMovement();
+        }
+
+        highestTravelledDistByTrack[currentSpawnPoint] = highestTravelledDist;
+        highestTravelledDist = 0;
+
+        int nextCurrentSpawnPoint = currentSpawnPoint + 1;
+
+        if (nextCurrentSpawnPoint == spawnPoints.Count) {
+            generations += 1;
+            currentSpawnPoint = 0;
             NaturalSelection();
+        } else {
+            currentSpawnPoint = nextCurrentSpawnPoint;
+            GenerateCars(thisGenerationCars);
         }
     }
 
@@ -151,9 +174,7 @@ public class GameRulesController : MonoBehaviour
 
     void GenerateCars(List<NeuralNetwork> newCars)
     {
-        int realCarNumber = newCars.Count > 0 ? newCars.Count : numCars*2;
-        generations += 1;
-        scoreHistory.Add(currentHighestScore);
+        int realCarNumber = newCars.Count > 0 ? newCars.Count : numCars;
         thisGenerationCars = new List<NeuralNetwork>();
         cars = new GameObject[realCarNumber];
         carsOrdered = new List<NeuralNetwork>();
@@ -161,7 +182,7 @@ public class GameRulesController : MonoBehaviour
         // Instantiate at position (0, 0, 0) and zero rotation.
         for (int i = 0; i < realCarNumber; i++)
         {
-            GameObject car = Instantiate(myPrefab, spawnPoint.transform.position, Quaternion.identity);
+            GameObject car = Instantiate(myPrefab, spawnPoints[currentSpawnPoint].transform.position, Quaternion.identity);
             NeuralNetwork carComp = new NeuralNetwork();
 
             carComp = car.GetComponent<NeuralNetwork>();
@@ -172,7 +193,12 @@ public class GameRulesController : MonoBehaviour
                 carComp.parentLayers = newCars[i].neuralLayers;
             }
 
-            carComp.carName = generations + "-" + i;
+            if (newCars.Count == 0 || (newCars.Count > 0 && newCars[i].carName == "")) {
+                carComp.carName = generations + "-" + i;
+            } else {
+                carComp.carName = newCars[i].carName;
+                carComp.distanceByTrack = newCars[i].distanceByTrack;
+            }
 
             thisGenerationCars.Add(carComp);
 
@@ -224,16 +250,18 @@ public class GameRulesController : MonoBehaviour
 
         foreach (NeuralNetwork car in thisGenerationCars)
         {
-            car.CalculateScore(highestTravelledDist, highestMeanVelInTicks);
-            float thisCarScore = car.score;
+            float thisCarScore = car.CalculateTotalScore(highestTravelledDistByTrack);
 
             if (thisCarScore > highestScore)
                 highestScore = thisCarScore;
         }
 
         currentHighestScore = highestScore;
+        scoreHistory.Add(currentHighestScore);
 
         carsOrdered = thisGenerationCars.ToList().OrderByDescending(o => o.score).ToList();
+
+        bestCurrentCar = carsOrdered[0].DeepCopy();
 
         //foreach (WheelVehicle car in thisGenerationCars)
         //{
@@ -267,13 +295,14 @@ public class GameRulesController : MonoBehaviour
             newCars.AddRange(CrossOver(carListProbabilities, numCars - 4));
 
             NeuralNetwork emptyCar = carsOrdered[0].DeepCopy();
+            emptyCar.carName = "";
             emptyCar.parentLayers = new List<Layer>();
             emptyCar.neuralLayers = new List<Layer>();
 
-            for(int i = 0; i < numCars; i++)
-            {
-                newCars.Add(emptyCar.DeepCopy());
-            }
+            // for(int i = 0; i < numCars; i++)
+            // {
+            //     newCars.Add(emptyCar.DeepCopy());
+            // }
 
             carsHistory.Add(carsOrdered);
             carsOrdered = new List<NeuralNetwork>();
@@ -336,6 +365,7 @@ public class GameRulesController : MonoBehaviour
             List<Neuron> previousLayerNeurons = new List<Neuron>();
 
             NeuralNetwork baseCar = carListProbabilities[carMotherIndex];
+            baseCar.carName = "";
 
             foreach(Layer layer in baseCar.neuralLayers)
             {
@@ -359,6 +389,7 @@ public class GameRulesController : MonoBehaviour
                 previousLayerNeurons = childCar.neuralLayers[j].neurons;
             }
 
+            childCar.carName = "";
             newCars.Add(childCar);
         }
 

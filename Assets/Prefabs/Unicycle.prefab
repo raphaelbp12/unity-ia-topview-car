@@ -362,7 +362,7 @@ MonoBehaviour:
   downforce: 10
   throttle: 0
   steering: 0
-  diffGearing: 3000
+  diffGearing: 5000
 --- !u!54 &2097299653188721007
 Rigidbody:
   m_ObjectHideFlags: 0

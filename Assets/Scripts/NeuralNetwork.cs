@@ -59,6 +59,9 @@ public class NeuralNetwork : MonoBehaviour
     public int ticksOnCrash = 3000;
     public float score = 0;
 
+    public List<float> distanceByTrack = new List<float>() {0, 0, 0, 0};
+    int currentTrack = 0;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -314,6 +317,12 @@ public class NeuralNetwork : MonoBehaviour
         Debug.Log("setGameoverCalled " + reason);
         if (!gameover)
         {
+            if (distanceByTrack.Count < currentTrack + 1)
+            {
+                distanceByTrack.Add(distanceTravelled);
+            } else {
+                distanceByTrack[currentTrack] = distanceTravelled;
+            }
             if (crashedOnWall)
             {
                 hasCrashedOnWall = crashedOnWall;
@@ -328,9 +337,10 @@ public class NeuralNetwork : MonoBehaviour
         }
     }
 
-    public float CalculateScore(float highestTravelledDist, float highestMeanVelInTicks)
+    public float CalculateScore(float highestTravelledDist, float highestMeanVelInTicks, int currentTrackInput)
     {
-        float normalizedTravelledDist = (highestTravelledDist - distanceTravelled + 0.000001f) / highestTravelledDist;
+        currentTrack = currentTrackInput;
+        float normalizedTravelledDist = 1 - ((highestTravelledDist - distanceTravelled + 0.000001f) / highestTravelledDist);
 
         if (highestTravelledDist == distanceTravelled)
         {
@@ -367,6 +377,44 @@ public class NeuralNetwork : MonoBehaviour
         return currentScore;
     }
 
+    public float CalculateTotalScore(List<float> highestTravelledDistByTrack) {
+        float scoreSum = 0f;
+        int totalTrackWeight = 0;
+
+        for (int i = 0; i < highestTravelledDistByTrack.Count; i++)
+        {
+            float highestTravelledDist = highestTravelledDistByTrack[i];
+            float dist = distanceByTrack[i];
+
+            float normalizedTravelledDist = 1 - ((highestTravelledDist - dist + 0.000001f) / highestTravelledDist);
+
+            int trackWeight = 1;
+
+            if (i == 1 || i == 2)
+            {
+                trackWeight = 2;
+            } else if (i == 3) {
+                trackWeight = 4;
+            }
+
+            if (highestTravelledDist <= dist)
+            {
+                normalizedTravelledDist = 1.0f;
+            }
+            scoreSum += normalizedTravelledDist * trackWeight;
+            totalTrackWeight += trackWeight;
+        }
+
+        score = scoreSum/totalTrackWeight;
+
+        for (int i = 0; i < distanceByTrack.Count; i++)
+        {
+            distanceByTrack[i] = 0f;
+        }
+
+        return score;
+    }
+
     public List<Neuron> GetGenome()
     {
         List<Neuron> genome = new List<Neuron>();
@@ -389,6 +437,7 @@ public class NeuralNetwork : MonoBehaviour
             other.neuralLayers.Add(layer.DeepCopy());
         }
 
+        other.carName = carName;
         return other;
     }
 
