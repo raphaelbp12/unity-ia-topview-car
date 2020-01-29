@@ -1,10 +1,12 @@
 ﻿using Assets.Classes;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using VehicleBehaviour;
+using Newtonsoft.Json;
 
 public class GameRulesController : MonoBehaviour
 {
@@ -53,12 +55,22 @@ public class GameRulesController : MonoBehaviour
     public int ticksIntervalCalcCamera = 20;
 
     private NeuralNetwork bestCurrentCar;
+    public Button saveBestCarButton;
+    public Button loadCarButton;
+    private string pathToTheFile = "/home/rbp/projeto_final_cars/";
+    public InputField carFileName;
 
     [SerializeField] List<WallMover> movingWalls;
 
     // This script will simply instantiate the Prefab when the game starts.
     void Start()
     {
+        Button saveBtn = saveBestCarButton.GetComponent<Button>();
+		saveBtn.onClick.AddListener(SaveBestCarOnClick);
+
+        Button loadBtn = loadCarButton.GetComponent<Button>();
+		loadBtn.onClick.AddListener(LoadCarOnClick);
+
         for (int i = 0; i < trackCount; i++)
         {
             highestTravelledDistByTrack.Add(0f);
@@ -121,6 +133,56 @@ public class GameRulesController : MonoBehaviour
         {
             PrepareNextTrack();
         }
+    }
+
+    void SaveBestCarOnClick(){
+		Debug.Log ("You have clicked the button!");
+        SaveCar(bestCurrentCar);
+	}
+
+    void LoadCarOnClick(){
+		Debug.Log ("You have clicked the button!");
+	}
+
+    public void SaveCar(NeuralNetwork car)
+    {
+        string path = pathToTheFile + "car.txt";
+
+        if (carFileName.text != "")
+        {
+            path = pathToTheFile + carFileName.text + ".txt";
+        }
+
+        if (!File.Exists(path)) {
+            File.Create(path);
+        }
+
+        var json = File.ReadAllText(path);
+        var carsParsed = JsonConvert.DeserializeObject<List<List<List<float>>>>(json);
+        List<List<List<float>>> neuralLayerWeights = new List<List<List<float>>>() {};
+
+        foreach (Layer layer in car.neuralLayers)
+        {
+            neuralLayerWeights.Add(layer.GetWeights());
+        }
+
+        File.WriteAllText(path, JsonConvert.SerializeObject(neuralLayerWeights));
+    }
+
+    public void GetSavedCar()
+    {
+        var json = File.ReadAllText(pathToTheFile);
+        var carsParsed = JsonConvert.DeserializeObject<List<List<List<float>>>>(json);
+        List<List<List<float>>> neuralLayerWeights = new List<List<List<float>>>() {};
+
+        // if (car != null)
+        // {
+        //     foreach (Layer layer in car.neuralLayers)
+        //     {
+        //         neuralLayerWeights.Add(layer.GetWeights());
+        //     }
+        // }
+        File.WriteAllText(pathToTheFile, JsonConvert.SerializeObject(neuralLayerWeights));
     }
 
     void PrepareNextTrack()
