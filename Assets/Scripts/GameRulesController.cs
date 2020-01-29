@@ -55,6 +55,8 @@ public class GameRulesController : MonoBehaviour
     public int ticksIntervalCalcCamera = 20;
 
     private NeuralNetwork bestCurrentCar;
+    private NeuralNetwork loadedNeuralNetwork;
+    private GameObject loadedCar;
     public Button saveBestCarButton;
     public Button loadCarButton;
     private string pathToTheFile = "/home/rbp/projeto_final_cars/";
@@ -141,7 +143,16 @@ public class GameRulesController : MonoBehaviour
 	}
 
     void LoadCarOnClick(){
-		Debug.Log ("You have clicked the button!");
+        string path = pathToTheFile + "car.txt";
+
+        if (carFileName.text != "")
+        {
+            path = pathToTheFile + carFileName.text + ".txt";
+        }
+
+        if (File.Exists(path)) {
+            LoadCar(path);
+        }
 	}
 
     public void SaveCar(NeuralNetwork car)
@@ -167,6 +178,16 @@ public class GameRulesController : MonoBehaviour
         }
 
         File.WriteAllText(path, JsonConvert.SerializeObject(neuralLayerWeights));
+    }
+
+    public void LoadCar(string path) {
+        var json = File.ReadAllText(path);
+        var neuralLayerWeights = JsonConvert.DeserializeObject<List<List<List<float>>>>(json);
+        NeuralNetwork carComp = new NeuralNetwork();
+
+        loadedNeuralNetwork = carComp;
+        loadedNeuralNetwork.neuralLayers = carComp.Network(neuralLayerWeights);
+        loadedNeuralNetwork.parentLayers = loadedNeuralNetwork.neuralLayers;
     }
 
     public void GetSavedCar()
@@ -237,6 +258,14 @@ public class GameRulesController : MonoBehaviour
     void GenerateCars(List<NeuralNetwork> newCars)
     {
         int realCarNumber = newCars.Count > 0 ? newCars.Count : numCars;
+
+        if (newCars.Count > 0 && loadedNeuralNetwork.neuralLayers.Count > 0)
+        {
+            newCars.Add(loadedNeuralNetwork.DeepCopy());
+            loadedNeuralNetwork = new NeuralNetwork();
+            realCarNumber += 1;
+        }
+
         thisGenerationCars = new List<NeuralNetwork>();
         cars = new GameObject[realCarNumber];
         carsOrdered = new List<NeuralNetwork>();

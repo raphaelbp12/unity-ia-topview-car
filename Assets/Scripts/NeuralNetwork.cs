@@ -106,7 +106,7 @@ public class NeuralNetwork : MonoBehaviour
 
         // GetCarOutputsToNeural();
 
-        Network();
+        Network(new List<List<List<float>>>());
     }
 
     List<float> GetCarOutputsToNeural()
@@ -203,7 +203,7 @@ public class NeuralNetwork : MonoBehaviour
         }
     }
 
-    private void Network()
+    public List<Layer> Network(List<List<List<float>>> weights)
     {
         List<Layer> newLayers = new List<Layer>();
 
@@ -217,51 +217,61 @@ public class NeuralNetwork : MonoBehaviour
             }
         }
 
-        List<float> neuralInputs = GetCarOutputsToNeural();
+        List<float> neuralInputs = new List<float>() {0,0,0,0,0,0,0,0};
+
+        if (weights.Count == 0)
+        {
+            neuralInputs = GetCarOutputsToNeural();
+        }
 
         Layer firstLayer = new Layer(neuralInputs, neuralInputs.Count, new List<Neuron>(), new List<List<float>>());
         newLayers.Add(firstLayer);
 
-        List<List<float>> pastSecondLayerWeights = neuralLayers.Count > 1 ? neuralLayers[1].GetWeights() : new List<List<float>>();
+        List<List<float>> pastSecondLayerWeights = weights.Count > 1 ? weights[1] : neuralLayers.Count > 1 ? neuralLayers[1].GetWeights() : new List<List<float>>();
         Layer secondLayer = new Layer(new List<float>(), 4, firstLayer.neurons, pastSecondLayerWeights);
         newLayers.Add(secondLayer);
 
-        List<List<float>> pastThirdLayerWeights = neuralLayers.Count > 2 ? neuralLayers[2].GetWeights() : new List<List<float>>();
+        List<List<float>> pastThirdLayerWeights = weights.Count > 2 ? weights[2] :  neuralLayers.Count > 2 ? neuralLayers[2].GetWeights() : new List<List<float>>();
         Layer thirdLayer = new Layer(new List<float>(), 4, secondLayer.neurons, pastThirdLayerWeights);
         newLayers.Add(thirdLayer);
 
-        List<List<float>> pastFourthLayerWeights = neuralLayers.Count > 3 ? neuralLayers[3].GetWeights() : new List<List<float>>();
+        List<List<float>> pastFourthLayerWeights = weights.Count > 3 ? weights[3] :  neuralLayers.Count > 3 ? neuralLayers[3].GetWeights() : new List<List<float>>();
         Layer fourthLayer = new Layer(new List<float>(), 2, thirdLayer.neurons, pastFourthLayerWeights);
         newLayers.Add(fourthLayer);
 
-        List<float> vels = fourthLayer.GetOutputs();
-
-        if (vels.Count > 0)
+        if (weights.Count == 0)
         {
-            randomThrottle = vels[0] * 2;
-            randomSteering = vels[1];
+            List<float> vels = fourthLayer.GetOutputs();
 
-            //randomThrottle = 10;
-            //randomSteering = 0;
+            if (vels.Count > 0)
+            {
+                randomThrottle = vels[0] * 2;
+                randomSteering = vels[1];
 
-            if (randomSteering > 1)
-                randomSteering = 1;
+                //randomThrottle = 10;
+                //randomSteering = 0;
 
-            if (Math.Abs(randomSteering) > Math.Abs(maxSteering))
-                maxSteering = randomSteering;
+                if (randomSteering > 1)
+                    randomSteering = 1;
 
-            if (Math.Abs(randomThrottle) > Math.Abs(maxThrottle))
-                maxThrottle = randomThrottle;
+                if (Math.Abs(randomSteering) > Math.Abs(maxSteering))
+                    maxSteering = randomSteering;
 
-            randomSteering = randomSteering * 1;
+                if (Math.Abs(randomThrottle) > Math.Abs(maxThrottle))
+                    maxThrottle = randomThrottle;
 
-            carGO.GetComponent<UnicycleController>().throttle = randomThrottle;
-            carGO.GetComponent<UnicycleController>().steering = randomSteering;
+                randomSteering = randomSteering * 1;
 
-            //Debug.Log("randomThrottle " + randomThrottle + " randomSteering " + randomSteering);
+                carGO.GetComponent<UnicycleController>().throttle = randomThrottle;
+                carGO.GetComponent<UnicycleController>().steering = randomSteering;
+
+                //Debug.Log("randomThrottle " + randomThrottle + " randomSteering " + randomSteering);
+            }
+
+            neuralLayers = newLayers;
         }
 
-        neuralLayers = newLayers;
+        return newLayers;
     }
 
     bool CalcGameover()
