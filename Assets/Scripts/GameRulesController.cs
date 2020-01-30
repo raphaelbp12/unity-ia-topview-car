@@ -56,7 +56,7 @@ public class GameRulesController : MonoBehaviour
 
     private NeuralNetwork bestCurrentCar;
     private NeuralNetwork loadedNeuralNetwork;
-    private GameObject loadedCar;
+    private bool wasCarLoaded = false;
     public Button saveBestCarButton;
     public Button loadCarButton;
     private string pathToTheFile = "/home/rbp/projeto_final_cars/";
@@ -188,22 +188,7 @@ public class GameRulesController : MonoBehaviour
         loadedNeuralNetwork = carComp;
         loadedNeuralNetwork.neuralLayers = carComp.Network(neuralLayerWeights);
         loadedNeuralNetwork.parentLayers = loadedNeuralNetwork.neuralLayers;
-    }
-
-    public void GetSavedCar()
-    {
-        var json = File.ReadAllText(pathToTheFile);
-        var carsParsed = JsonConvert.DeserializeObject<List<List<List<float>>>>(json);
-        List<List<List<float>>> neuralLayerWeights = new List<List<List<float>>>() {};
-
-        // if (car != null)
-        // {
-        //     foreach (Layer layer in car.neuralLayers)
-        //     {
-        //         neuralLayerWeights.Add(layer.GetWeights());
-        //     }
-        // }
-        File.WriteAllText(pathToTheFile, JsonConvert.SerializeObject(neuralLayerWeights));
+        wasCarLoaded = true;
     }
 
     void PrepareNextTrack()
@@ -259,11 +244,12 @@ public class GameRulesController : MonoBehaviour
     {
         int realCarNumber = newCars.Count > 0 ? newCars.Count : numCars;
 
-        if (newCars.Count > 0 && loadedNeuralNetwork.neuralLayers.Count > 0)
+        if (wasCarLoaded && newCars.Count > 0 && loadedNeuralNetwork.neuralLayers.Count > 0)
         {
             newCars.Add(loadedNeuralNetwork.DeepCopy());
             loadedNeuralNetwork = new NeuralNetwork();
             realCarNumber += 1;
+            wasCarLoaded = false;
         }
 
         thisGenerationCars = new List<NeuralNetwork>();
