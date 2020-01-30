@@ -61,7 +61,7 @@ public class GameRulesController : MonoBehaviour
     private bool wasCarLoaded = false;
     public Button saveBestCarButton;
     public Button loadCarButton;
-    private string pathToTheFile = "/home/rbp/projeto_final_cars/";
+    private string pathToTheFile = "./cars/";
     public InputField carFileName;
 
     public List<string> existingCars = new List<string>() {"car", "massa"};
@@ -258,7 +258,10 @@ public class GameRulesController : MonoBehaviour
             foreach (string fileName in existingCars)
             {
                 string path = pathToTheFile + fileName + ".txt";
-                LoadCar(path);
+                if (File.Exists(path))
+                {
+                    LoadCar(path);
+                }
             }
         }
 
@@ -273,7 +276,7 @@ public class GameRulesController : MonoBehaviour
             loadedNeuralNetworks = new List<NeuralNetwork>();
             wasCarLoaded = false;
         }
-        
+
         cars = new GameObject[realCarNumber];
 
         // Instantiate at position (0, 0, 0) and zero rotation.

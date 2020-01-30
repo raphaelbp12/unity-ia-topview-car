@@ -44,7 +44,7 @@ public class NeuralNetwork : MonoBehaviour
     private float minValidDistanceIncrement = 0.005f;
     private float minMeanVel = 0.04f;
     private float minInstantVel = 0.04f;
-    private int maxLifeTimeSec = 2500;
+    private int maxLifeTimeSec = 5500;
     private int minLifeTimeSec = 500;
     private float minDistAllowed = 10;
     private float minDistInLastTimeAllowed = 5;
@@ -56,7 +56,7 @@ public class NeuralNetwork : MonoBehaviour
     public float distanceTravelled = 0.0f;
     public float meanVel = 50;
     public bool hasCrashedOnWall = false;
-    public int ticksOnCrash = 3000;
+    public int ticksOnCrash = 5000;
     public float score = 0;
 
     public List<float> distanceByTrack = new List<float>() {0, 0, 0, 0};
@@ -292,10 +292,10 @@ public class NeuralNetwork : MonoBehaviour
         if (realTime > minLifeTimeSec)
         {
 
-            if (distanceInLastTime < minDistInLastTimeAllowed)
-            {
-                setGameover(false, "distancia percorrida mto pequena nos ultimos ticks");
-            }
+            // if (distanceInLastTime < minDistInLastTimeAllowed)
+            // {
+            //     setGameover(false, "distancia percorrida mto pequena nos ultimos ticks");
+            // }
 
             //if (distanceTravelled < minDistAllowed)
             //{
@@ -304,15 +304,15 @@ public class NeuralNetwork : MonoBehaviour
 
             meanVel = distanceTravelled / realTime;
 
-            if (meanVel < minMeanVel)
-            {
-                setGameover(false, "velocidade media baixa");
-            }
+            // if (meanVel < minMeanVel)
+            // {
+            //     setGameover(false, "velocidade media baixa");
+            // }
 
-            if (linearVel < minInstantVel)
-            {
-                setGameover(false, "velocidade instantanea baixa");
-            }
+            // if (linearVel < minInstantVel)
+            // {
+            //     setGameover(false, "velocidade instantanea baixa");
+            // }
         }
 
         if (realTime > maxLifeTimeSec)
