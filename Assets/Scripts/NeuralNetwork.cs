@@ -59,7 +59,7 @@ public class NeuralNetwork : MonoBehaviour
     public int ticksOnCrash = 5000;
     public float score = 0;
 
-    public List<float> distanceByTrack = new List<float>() {0, 0, 0, 0};
+    public List<float> distanceByTrack = new List<float>() {0, 0, 0, 0, 0};
     int currentTrack = 0;
 
     // Start is called before the first frame update
@@ -292,10 +292,10 @@ public class NeuralNetwork : MonoBehaviour
         if (realTime > minLifeTimeSec)
         {
 
-            // if (distanceInLastTime < minDistInLastTimeAllowed)
-            // {
-            //     setGameover(false, "distancia percorrida mto pequena nos ultimos ticks");
-            // }
+            if (distanceInLastTime < minDistInLastTimeAllowed)
+            {
+                setGameover(false, "distancia percorrida mto pequena nos ultimos ticks");
+            }
 
             //if (distanceTravelled < minDistAllowed)
             //{
@@ -304,15 +304,15 @@ public class NeuralNetwork : MonoBehaviour
 
             meanVel = distanceTravelled / realTime;
 
-            // if (meanVel < minMeanVel)
-            // {
-            //     setGameover(false, "velocidade media baixa");
-            // }
+            if (meanVel < minMeanVel)
+            {
+                setGameover(false, "velocidade media baixa");
+            }
 
-            // if (linearVel < minInstantVel)
-            // {
-            //     setGameover(false, "velocidade instantanea baixa");
-            // }
+            if (linearVel < minInstantVel)
+            {
+                setGameover(false, "velocidade instantanea baixa");
+            }
         }
 
         if (realTime > maxLifeTimeSec)
@@ -403,7 +403,7 @@ public class NeuralNetwork : MonoBehaviour
             if (i == 1 || i == 2)
             {
                 trackWeight = 2;
-            } else if (i == 3) {
+            } else if (i >= 3) {
                 trackWeight = 4;
             }
 
