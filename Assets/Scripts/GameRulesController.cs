@@ -12,6 +12,7 @@ public class GameRulesController : MonoBehaviour
 {
     // Reference to the Prefab. Drag a Prefab into this field in the Inspector.
 
+    public bool showDrawDebug = false;
     public int trackCount = 3;
     public int generations = 0;
     public GameObject myPrefab;
@@ -56,11 +57,14 @@ public class GameRulesController : MonoBehaviour
 
     private NeuralNetwork bestCurrentCar;
     private NeuralNetwork loadedNeuralNetwork;
+    private List<NeuralNetwork> loadedNeuralNetworks = new List<NeuralNetwork>();
     private bool wasCarLoaded = false;
     public Button saveBestCarButton;
     public Button loadCarButton;
     private string pathToTheFile = "/home/rbp/projeto_final_cars/";
     public InputField carFileName;
+
+    public List<string> existingCars = new List<string>() {"car", "massa"};
 
     [SerializeField] List<WallMover> movingWalls;
 
@@ -105,6 +109,7 @@ public class GameRulesController : MonoBehaviour
 
             foreach (NeuralNetwork car in newCars)
             {
+                car.showDebugDraw = showDrawDebug;
                 if (car.distanceTravelled > highestTravelledDist)
                 {
                     highestTravelledDist = car.distanceTravelled;
@@ -188,6 +193,7 @@ public class GameRulesController : MonoBehaviour
         loadedNeuralNetwork = carComp;
         loadedNeuralNetwork.neuralLayers = carComp.Network(neuralLayerWeights);
         loadedNeuralNetwork.parentLayers = loadedNeuralNetwork.neuralLayers;
+        loadedNeuralNetworks.Add(loadedNeuralNetwork.DeepCopy());
         wasCarLoaded = true;
     }
 
@@ -244,17 +250,31 @@ public class GameRulesController : MonoBehaviour
     {
         int realCarNumber = newCars.Count > 0 ? newCars.Count : numCars;
 
-        if (wasCarLoaded && newCars.Count > 0 && loadedNeuralNetwork.neuralLayers.Count > 0)
+        thisGenerationCars = new List<NeuralNetwork>();
+        carsOrdered = new List<NeuralNetwork>();
+
+        if (newCars.Count == 0)
         {
-            newCars.Add(loadedNeuralNetwork.DeepCopy());
-            loadedNeuralNetwork = new NeuralNetwork();
-            realCarNumber += 1;
-            wasCarLoaded = false;
+            foreach (string fileName in existingCars)
+            {
+                string path = pathToTheFile + fileName + ".txt";
+                LoadCar(path);
+            }
         }
 
-        thisGenerationCars = new List<NeuralNetwork>();
+        if (wasCarLoaded && newCars.Count > 0 && loadedNeuralNetworks.Count > 0)
+        {
+            foreach(NeuralNetwork car in loadedNeuralNetworks)
+            {
+                newCars.Add(loadedNeuralNetwork.DeepCopy());
+                loadedNeuralNetwork = new NeuralNetwork();
+                realCarNumber += 1;
+            }
+            loadedNeuralNetworks = new List<NeuralNetwork>();
+            wasCarLoaded = false;
+        }
+        
         cars = new GameObject[realCarNumber];
-        carsOrdered = new List<NeuralNetwork>();
 
         // Instantiate at position (0, 0, 0) and zero rotation.
         for (int i = 0; i < realCarNumber; i++)
