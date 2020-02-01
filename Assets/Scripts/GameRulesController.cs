@@ -64,7 +64,7 @@ public class GameRulesController : MonoBehaviour
     private string pathToTheFile = "./cars/";
     public InputField carFileName;
 
-    public List<string> existingCars = new List<string>() {"car", "massa"};
+    private List<string> existingCars = new List<string>() {"car", "massa", "dia1"};
 
     [SerializeField] List<WallMover> movingWalls;
 
