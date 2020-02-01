@@ -42,12 +42,12 @@ public class NeuralNetwork : MonoBehaviour
 
 
     private float minValidDistanceIncrement = 0.005f;
-    private float minMeanVel = 0.04f;
-    private float minInstantVel = 0.04f;
+    private float minMeanVel = 0.02f;
+    private float minInstantVel = 0.02f;
     private int maxLifeTimeSec = 5500;
     private int minLifeTimeSec = 500;
-    private float minDistAllowed = 10;
-    private float minDistInLastTimeAllowed = 5;
+    private float minDistAllowed = 5;
+    private float minDistInLastTimeAllowed = 2;
 
     public float meanVelInTicks = 0;
     public int ticks = 0;
