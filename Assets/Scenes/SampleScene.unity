@@ -1177,7 +1177,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 91835742}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -27.929514, y: 7.871875, z: 3.3302457}
+  m_LocalPosition: {x: -28.829515, y: 7.871875, z: 3.3302457}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1007811691}
@@ -10646,9 +10646,6 @@ MonoBehaviour:
   saveBestCarButton: {fileID: 1002622974}
   loadCarButton: {fileID: 218055600}
   carFileName: {fileID: 2101988495}
-  existingCars:
-  - car
-  - massa
   movingWalls:
   - {fileID: 1500337942}
   - {fileID: 910128140}
@@ -10728,7 +10725,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 910128138}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -73.9, y: 7.171875, z: -51.469753}
+  m_LocalPosition: {x: -74.8, y: 7.171875, z: -51.469753}
   m_LocalScale: {x: 8.873638, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1198107833}

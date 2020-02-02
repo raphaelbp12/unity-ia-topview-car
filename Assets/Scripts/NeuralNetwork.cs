@@ -62,6 +62,9 @@ public class NeuralNetwork : MonoBehaviour
     public List<float> distanceByTrack = new List<float>() {0, 0, 0, 0, 0};
     int currentTrack = 0;
 
+    public bool wasLoaded = false;
+    public bool firstScore = false;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -80,6 +83,29 @@ public class NeuralNetwork : MonoBehaviour
         lastDistancePosition = carGO.transform.position;
         //goalDistance = 0.0f;
         //goalAngle = 0.0f;
+
+        
+
+        if (wasLoaded && !firstScore)
+        {
+            SetColor(Color.green);
+        } else if (wasLoaded && firstScore)
+        {
+            SetColor(Color.yellow);
+        } else if (!wasLoaded && firstScore)
+        {
+            SetColor(Color.blue);
+        }
+    }
+
+    public void SetColor(Color inputColor)
+    {
+        CubeController cubeController = carGO.GetComponentInChildren<CubeController>();
+        //Get the Renderer component from the new cube
+        var cube = cubeController.GetComponent<Renderer>();
+
+        //Call SetColor using the shader property name "_Color" and setting the color to red
+        cube.material.SetColor("_Color", inputColor);
     }
 
     // Update is called once per frame
@@ -448,6 +474,8 @@ public class NeuralNetwork : MonoBehaviour
         }
 
         other.carName = carName;
+        other.wasLoaded = wasLoaded;
+        other.firstScore = firstScore;
         return other;
     }
 

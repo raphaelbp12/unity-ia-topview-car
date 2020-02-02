@@ -63,8 +63,10 @@ public class GameRulesController : MonoBehaviour
     public Button loadCarButton;
     private string pathToTheFile = "./cars/";
     public InputField carFileName;
+    // private List<string> existingCars = new List<string>();
+    private List<string> existingCars = new List<string>() {"massa", "dia1", "dia2", "dia3", "diferente"};
 
-    private List<string> existingCars = new List<string>() {"car", "massa", "dia1", "dia2", "dia3"};
+    public int numberPersistentCars = 4;
 
     [SerializeField] List<WallMover> movingWalls;
 
@@ -76,6 +78,11 @@ public class GameRulesController : MonoBehaviour
 
         Button loadBtn = loadCarButton.GetComponent<Button>();
 		loadBtn.onClick.AddListener(LoadCarOnClick);
+
+        if (existingCars.Count > 0)
+        {
+            numberPersistentCars = existingCars.Count;
+        }
 
         for (int i = 0; i < trackCount; i++)
         {
@@ -269,7 +276,9 @@ public class GameRulesController : MonoBehaviour
         {
             foreach(NeuralNetwork car in loadedNeuralNetworks)
             {
-                newCars.Add(loadedNeuralNetwork.DeepCopy());
+                NeuralNetwork carToAdd = car.DeepCopy();
+                carToAdd.wasLoaded = true;
+                newCars.Add(carToAdd);
                 loadedNeuralNetwork = new NeuralNetwork();
                 realCarNumber += 1;
             }
@@ -291,6 +300,8 @@ public class GameRulesController : MonoBehaviour
             if (newCars.Count > 0)
             {
                 carComp.parentLayers = newCars[i].neuralLayers;
+                carComp.wasLoaded = newCars[i].wasLoaded;
+                carComp.firstScore = newCars[i].firstScore;
             }
 
             if (newCars.Count == 0 || (newCars.Count > 0 && newCars[i].carName == "")) {
@@ -350,6 +361,8 @@ public class GameRulesController : MonoBehaviour
 
         foreach (NeuralNetwork car in thisGenerationCars)
         {
+            car.firstScore = false;
+            
             float thisCarScore = car.CalculateTotalScore(highestTravelledDistByTrack);
 
             if (thisCarScore > highestScore)
@@ -388,16 +401,20 @@ public class GameRulesController : MonoBehaviour
 
         if (carsOrdered[0].score != 0 && carsOrdered[1].score != 0)
         {
-            newCars.Add(carsOrdered[0].DeepCopy());
-            newCars.Add(carsOrdered[1].DeepCopy());
+            carsOrdered[0].firstScore = true;
+
+            for (int i = 0; i < numberPersistentCars; i++)
+            {
+                newCars.Add(carsOrdered[i].DeepCopy());
+            }
             newCars.Add(carsOrdered[numCars - 1].DeepCopy());
             newCars.Add(carsOrdered[numCars - 2].DeepCopy());
-            newCars.AddRange(CrossOver(carListProbabilities, numCars - 4));
+            newCars.AddRange(CrossOver(carListProbabilities, numCars - (2 + numberPersistentCars)));
 
-            NeuralNetwork emptyCar = carsOrdered[0].DeepCopy();
-            emptyCar.carName = "";
-            emptyCar.parentLayers = new List<Layer>();
-            emptyCar.neuralLayers = new List<Layer>();
+            // NeuralNetwork emptyCar = carsOrdered[0].DeepCopy();
+            // emptyCar.carName = "";
+            // emptyCar.parentLayers = new List<Layer>();
+            // emptyCar.neuralLayers = new List<Layer>();
 
             // for(int i = 0; i < numCars; i++)
             // {
@@ -465,7 +482,6 @@ public class GameRulesController : MonoBehaviour
             List<Neuron> previousLayerNeurons = new List<Neuron>();
 
             NeuralNetwork baseCar = carListProbabilities[carMotherIndex];
-            baseCar.carName = "";
 
             foreach(Layer layer in baseCar.neuralLayers)
             {
