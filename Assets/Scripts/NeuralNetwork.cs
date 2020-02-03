@@ -65,6 +65,8 @@ public class NeuralNetwork : MonoBehaviour
     public bool wasLoaded = false;
     public bool firstScore = false;
 
+    public bool topScore = false;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -95,6 +97,9 @@ public class NeuralNetwork : MonoBehaviour
         } else if (!wasLoaded && firstScore)
         {
             SetColor(Color.blue);
+        } else if (topScore)
+        {
+            SetColor(Color.gray);
         }
     }
 
@@ -476,6 +481,7 @@ public class NeuralNetwork : MonoBehaviour
         other.carName = carName;
         other.wasLoaded = wasLoaded;
         other.firstScore = firstScore;
+        other.topScore = topScore;
         return other;
     }
 

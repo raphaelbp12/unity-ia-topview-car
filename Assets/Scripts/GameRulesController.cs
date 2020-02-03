@@ -82,6 +82,11 @@ public class GameRulesController : MonoBehaviour
         if (existingCars.Count > 0)
         {
             numberPersistentCars = existingCars.Count;
+
+            if (numberPersistentCars > numberOfParents)
+            {
+                numberOfParents = numberPersistentCars;
+            }
         }
 
         for (int i = 0; i < trackCount; i++)
@@ -302,6 +307,7 @@ public class GameRulesController : MonoBehaviour
                 carComp.parentLayers = newCars[i].neuralLayers;
                 carComp.wasLoaded = newCars[i].wasLoaded;
                 carComp.firstScore = newCars[i].firstScore;
+                carComp.topScore = newCars[i].topScore;
             }
 
             if (newCars.Count == 0 || (newCars.Count > 0 && newCars[i].carName == "")) {
@@ -362,6 +368,7 @@ public class GameRulesController : MonoBehaviour
         foreach (NeuralNetwork car in thisGenerationCars)
         {
             car.firstScore = false;
+            car.topScore = false;
             
             float thisCarScore = car.CalculateTotalScore(highestTravelledDistByTrack);
 
@@ -405,7 +412,9 @@ public class GameRulesController : MonoBehaviour
 
             for (int i = 0; i < numberPersistentCars; i++)
             {
-                newCars.Add(carsOrdered[i].DeepCopy());
+                NeuralNetwork carToAdd = carsOrdered[i].DeepCopy();
+                carToAdd.topScore = true;
+                newCars.Add(carToAdd);
             }
             newCars.Add(carsOrdered[numCars - 1].DeepCopy());
             newCars.Add(carsOrdered[numCars - 2].DeepCopy());
