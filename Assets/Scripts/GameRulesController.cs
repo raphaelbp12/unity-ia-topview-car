@@ -13,7 +13,7 @@ public class GameRulesController : MonoBehaviour
     // Reference to the Prefab. Drag a Prefab into this field in the Inspector.
 
     public bool showDrawDebug = false;
-    public int trackCount = 3;
+    private int trackCount;
     public int generations = 0;
     public GameObject myPrefab;
     public GameObject camera;
@@ -73,6 +73,8 @@ public class GameRulesController : MonoBehaviour
     // This script will simply instantiate the Prefab when the game starts.
     void Start()
     {
+        trackCount = spawnPoints.Count;
+
         Button saveBtn = saveBestCarButton.GetComponent<Button>();
 		saveBtn.onClick.AddListener(SaveBestCarOnClick);
 
@@ -160,15 +162,17 @@ public class GameRulesController : MonoBehaviour
 	}
 
     void LoadCarOnClick(){
+        string carName = "car";
         string path = pathToTheFile + "car.txt";
 
         if (carFileName.text != "")
         {
-            path = pathToTheFile + carFileName.text + ".txt";
+            carName = carFileName.text;
+            path = pathToTheFile + carName + ".txt";
         }
 
         if (File.Exists(path)) {
-            LoadCar(path);
+            LoadCar(path, carName);
         }
 	}
 
@@ -197,10 +201,11 @@ public class GameRulesController : MonoBehaviour
         File.WriteAllText(path, JsonConvert.SerializeObject(neuralLayerWeights));
     }
 
-    public void LoadCar(string path) {
+    public void LoadCar(string path, string carName) {
         var json = File.ReadAllText(path);
         var neuralLayerWeights = JsonConvert.DeserializeObject<List<List<List<float>>>>(json);
         NeuralNetwork carComp = new NeuralNetwork();
+        carComp.carName = carName;
 
         loadedNeuralNetwork = carComp;
         loadedNeuralNetwork.neuralLayers = carComp.Network(neuralLayerWeights);
@@ -261,6 +266,7 @@ public class GameRulesController : MonoBehaviour
     void GenerateCars(List<NeuralNetwork> newCars)
     {
         int realCarNumber = newCars.Count > 0 ? newCars.Count : numCars;
+        int loadedCars = 0;
 
         thisGenerationCars = new List<NeuralNetwork>();
         carsOrdered = new List<NeuralNetwork>();
@@ -272,12 +278,12 @@ public class GameRulesController : MonoBehaviour
                 string path = pathToTheFile + fileName + ".txt";
                 if (File.Exists(path))
                 {
-                    LoadCar(path);
+                    LoadCar(path, fileName);
                 }
             }
         }
 
-        if (wasCarLoaded && newCars.Count > 0 && loadedNeuralNetworks.Count > 0)
+        if (wasCarLoaded && loadedNeuralNetworks.Count > 0)
         {
             foreach(NeuralNetwork car in loadedNeuralNetworks)
             {
@@ -285,10 +291,12 @@ public class GameRulesController : MonoBehaviour
                 carToAdd.wasLoaded = true;
                 newCars.Add(carToAdd);
                 loadedNeuralNetwork = new NeuralNetwork();
-                realCarNumber += 1;
+                loadedCars += 1;
             }
             loadedNeuralNetworks = new List<NeuralNetwork>();
             wasCarLoaded = false;
+
+            realCarNumber += loadedCars;
         }
 
         cars = new GameObject[realCarNumber];
@@ -302,19 +310,18 @@ public class GameRulesController : MonoBehaviour
             carComp = car.GetComponent<NeuralNetwork>();
             carComp.gameSpeed = gameSpeed;
 
-            if (newCars.Count > 0)
-            {
+            if ( i < newCars.Count) {
                 carComp.parentLayers = newCars[i].neuralLayers;
                 carComp.wasLoaded = newCars[i].wasLoaded;
                 carComp.firstScore = newCars[i].firstScore;
                 carComp.topScore = newCars[i].topScore;
-            }
 
-            if (newCars.Count == 0 || (newCars.Count > 0 && newCars[i].carName == "")) {
-                carComp.carName = generations + "-" + i;
-            } else {
-                carComp.carName = newCars[i].carName;
-                carComp.distanceByTrack = newCars[i].distanceByTrack;
+                if (newCars[i].carName == "") {
+                    carComp.carName = generations + "-" + i;
+                } else {
+                    carComp.carName = newCars[i].carName;
+                    carComp.distanceByTrack = newCars[i].distanceByTrack;
+                }
             }
 
             thisGenerationCars.Add(carComp);

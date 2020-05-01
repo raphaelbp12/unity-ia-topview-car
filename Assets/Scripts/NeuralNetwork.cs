@@ -209,28 +209,31 @@ public class NeuralNetwork : MonoBehaviour
         // Does the ray intersect any objects excluding the player layer
 
         Vector3 transformDir = Vector3.ProjectOnPlane(carGO.transform.TransformDirection(direction), new Vector3(0, 1, 0));
+        float noise = UnityEngine.Random.Range(-2.0f, 2.0f);
 
         if (Physics.Raycast(carGO.transform.position, transformDir, out hit, maxDist, layerMask))
         {
             //Debug.Log("Did Hit  " + hit.collider.gameObject.tag);
+            float distance = hit.distance - noise;
             if (hit.collider.CompareTag("Wall"))
             {
                 if (showDebugDraw)
-                    Debug.DrawRay(carGO.transform.position, transformDir * hit.distance, Color.green);
-                return hit.distance;
+                    Debug.DrawRay(carGO.transform.position, transformDir * distance, Color.green);
+                return distance;
             } else
             {
                 if (showDebugDraw)
-                    Debug.DrawRay(carGO.transform.position, transformDir * hit.distance, Color.yellow);
-                return maxDist;
+                    Debug.DrawRay(carGO.transform.position, transformDir * distance, Color.yellow);
+                return distance;
             }
         }
         else
         {
+            float distance = maxDist - noise;
             if (showDebugDraw)
-                Debug.DrawRay(carGO.transform.position, transformDir * maxDist, Color.red);
+                Debug.DrawRay(carGO.transform.position, transformDir * distance, Color.red);
             //Debug.Log("Did not Hit");
-            return maxDist;
+            return distance;
         }
     }
 
