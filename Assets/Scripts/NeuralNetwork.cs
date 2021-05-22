@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Profiling;
 using VehicleBehaviour;
 
 public class NeuralNetwork : MonoBehaviour
@@ -73,7 +74,7 @@ public class NeuralNetwork : MonoBehaviour
         //goal = GameObject.FindGameObjectWithTag("Goal");
 
         GameObject car = Instantiate(modelPrefab, transform.position, Quaternion.identity);
-        car.GetComponent<UnicycleController>().parentNeuralNetwork = this;
+        car.GetComponent<CinematicUnicycleController>().parentNeuralNetwork = this;
         carGO = car.gameObject;
 
         _rb = carGO.GetComponent<Rigidbody>();
@@ -178,13 +179,22 @@ public class NeuralNetwork : MonoBehaviour
         //result.Add(goalDistance);
         //result.Add(goalAngle);
 
-        result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(0, 0, 1)));
-        result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(0, 0, -1)));
-        result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(0.5f, 0, 0.866f))); // 30 degrees
-        result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(-0.5f, 0, 0.866f))); // 30 degrees
+        var front = Vector3.forward;
+        var back = Vector3.back;
 
-        result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(0.9659f, 0, 0.2588f))); // 15 degrees
-        result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(-0.9659f, 0, 0.2588f))); // 15 degrees
+        var deg15 = (Quaternion.Euler(0, -15, 0) * front).normalized;
+        var deg15mirrored = (Quaternion.Euler(0, 15, 0) * front).normalized;
+
+        var deg30 = (Quaternion.Euler(0, -30, 0) * front).normalized;
+        var deg30mirrored = (Quaternion.Euler(0, 30, 0) * front).normalized;
+
+        result.Add(GetLaserDistToWall(maxLaserDistance, front));
+        result.Add(GetLaserDistToWall(maxLaserDistance, back));
+        result.Add(GetLaserDistToWall(maxLaserDistance, deg30)); // 30 degrees
+        result.Add(GetLaserDistToWall(maxLaserDistance, deg30mirrored)); // 30 degrees
+
+        result.Add(GetLaserDistToWall(maxLaserDistance, deg15)); // 15 degrees
+        result.Add(GetLaserDistToWall(maxLaserDistance, deg15mirrored)); // 15 degrees
 
         //result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(-1, 0, 0)) / maxLaserDistance);
         //result.Add(GetLaserDistToWall(maxLaserDistance, new Vector3(1, 0, 0)) / maxLaserDistance);
@@ -202,7 +212,7 @@ public class NeuralNetwork : MonoBehaviour
         // Bit shift the index of the layer (8) to get a bit mask
         int layerMask = ~ ((1 << 8) | (1 << 9) | (1 << 10));
 
-        // This would cast rays only against colliders in layer 8.
+        // This would cast rays only against colliders in layer 8, 9 and 10.
         // But instead we want to collide against everything except layer 8. The ~ operator does this, it inverts a bitmask.
 
         RaycastHit hit;
@@ -239,6 +249,7 @@ public class NeuralNetwork : MonoBehaviour
 
     public List<Layer> Network(List<List<List<float>>> weights)
     {
+        Profiler.BeginSample("network");
         List<Layer> newLayers = new List<Layer>();
 
         if (parentLayers.Count > 0 && neuralLayers.Count == 0)
@@ -296,8 +307,8 @@ public class NeuralNetwork : MonoBehaviour
 
                 randomSteering = randomSteering * 1;
 
-                carGO.GetComponent<UnicycleController>().throttle = randomThrottle;
-                carGO.GetComponent<UnicycleController>().steering = randomSteering;
+                carGO.GetComponent<CinematicUnicycleController>().linearVelocity = randomThrottle;
+                carGO.GetComponent<CinematicUnicycleController>().angularVelocity = randomSteering;
 
                 //Debug.Log("randomThrottle " + randomThrottle + " randomSteering " + randomSteering);
             }
@@ -305,6 +316,7 @@ public class NeuralNetwork : MonoBehaviour
             neuralLayers = newLayers;
         }
 
+        Profiler.EndSample();
         return newLayers;
     }
 

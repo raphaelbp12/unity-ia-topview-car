@@ -12901,7 +12901,7 @@ MonoBehaviour:
   remainingCarText: {fileID: 1003187577}
   gameSpeedSlider: {fileID: 479332790}
   gameSpeedText: {fileID: 1046456796}
-  numCars: 200
+  numCars: 500
   carsOrdered: []
   thisGenerationCars: []
   highestTravelledDist: 0

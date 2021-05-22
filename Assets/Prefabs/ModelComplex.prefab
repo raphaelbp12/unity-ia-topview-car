@@ -43,7 +43,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef729547a0a05a24a8cb5ddea0d0e99d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  modelPrefab: {fileID: 6762936429033320200, guid: 5b542724ed3cff447a510d82ddf515b0,
+  modelPrefab: {fileID: 6762936429033320200, guid: 3cb181394f9a6754ab0936698532347f,
     type: 3}
   car: {fileID: 0}
   carGO: {fileID: 0}
@@ -56,11 +56,7 @@ MonoBehaviour:
   randomSteering: 0
   maxSteering: 0
   maxThrottle: 0
-  minMeanVel: 0.04
-  minInstantVel: 0.04
-  maxLifeTimeSec: 2500
-  minLifeTimeSec: 500
-  minDistAllowed: 10
+  lastDistanceInLastTime: {x: 0, y: 0, z: 0}
   meanVelInTicks: 0
   ticks: 0
   ticksWithMinDistanceValid: 0
@@ -70,3 +66,12 @@ MonoBehaviour:
   hasCrashedOnWall: 0
   ticksOnCrash: 3000
   score: 0
+  distanceByTrack:
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  wasLoaded: 0
+  firstScore: 0
+  topScore: 0
