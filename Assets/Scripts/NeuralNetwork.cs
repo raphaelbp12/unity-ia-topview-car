@@ -416,7 +416,7 @@ public class NeuralNetwork : MonoBehaviour
             currentScore = 0;
         }
 
-        return currentScore/pathPoints.Count;
+        return (float)currentScore/pathPoints.Count;
     }
 
     public float CalculateTotalScore(List<WallPath> wallPaths) {
