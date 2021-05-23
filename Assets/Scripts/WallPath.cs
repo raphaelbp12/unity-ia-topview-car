@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class WallPath : MonoBehaviour
 {
@@ -28,5 +29,10 @@ public class WallPath : MonoBehaviour
     public Vector3 GetWaypoint(int i)
     {
         return transform.GetChild(i).position;
+    }
+
+    public List<Vector3> GetPoints()
+    {
+        return transform.Cast<Transform>().Select(childTransform => childTransform.position).ToList();
     }
 }

@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class WallMover : MonoBehaviour
 {
-    [SerializeField] WallPath wallPath;
+    [SerializeField] public WallPath wallPath;
     [SerializeField] float waypointTolerance = 1f;
     [SerializeField] float speed = 1f;
     public int currentWaypointIndex;

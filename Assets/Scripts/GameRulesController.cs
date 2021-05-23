@@ -70,6 +70,8 @@ public class GameRulesController : MonoBehaviour
 
     [SerializeField] List<WallMover> movingWalls;
 
+    private List<WallPath> wallPaths = new List<WallPath>();
+
     // This script will simply instantiate the Prefab when the game starts.
     void Start()
     {
@@ -97,6 +99,12 @@ public class GameRulesController : MonoBehaviour
         }
         Time.timeScale = gameSpeed;
         GenerateCars(new List<NeuralNetwork>());
+
+
+        for (int i = 0; i < trackCount; i++)
+        {
+            wallPaths.Add(movingWalls[i+1].wallPath);
+        }
     }
 
     void Update()
@@ -121,38 +129,34 @@ public class GameRulesController : MonoBehaviour
             if (ticks % ticksIntervalCalcCamera != 0)
                 return;
 
-            foreach (NeuralNetwork car in newCars)
-            {
-                car.showDebugDraw = showDrawDebug;
-                if (car.distanceTravelled > highestTravelledDist)
-                {
-                    highestTravelledDist = car.distanceTravelled;
-                }
 
-                //if (car.goalDistance > highestGoalDistance)
-                //{
-                //    highestGoalDistance = car.goalDistance;
-                //}
-
-                if (car.meanVelInTicks > highestMeanVelInTicks)
-                {
-                    highestMeanVelInTicks = car.meanVelInTicks;
-                }
-            }
-
-
-            foreach (NeuralNetwork car in newCars)
-            {
-                float score = car.CalculateScore(highestTravelledDist, highestMeanVelInTicks, currentSpawnPoint);
-            }
-
-            carsOrdered = newCars.ToList().OrderByDescending(o => o.score).ToList();
-
-
+            carsOrdered = newCars.ToList().OrderByDescending(o => o.distanceTravelled).ToList();
             SelectCarToCamera(carsOrdered);
-        } else
+        }
+        else
         {
             PrepareNextTrack();
+        }
+    }
+
+    void SelectCarToCamera(List<NeuralNetwork> newCars)
+    {
+        if (newCars.Count > 0)
+        {
+            if (!newCars[0].gameObject.activeInHierarchy)
+            {
+                Debug.Log("newCars length " + newCars.Count);
+                for (int i = 0; i < newCars.Count; i++)
+                {
+                    var car = newCars[i];
+                    if (car.gameObject.activeInHierarchy)
+                    {
+                        activeCarIndex = i;
+                    }
+                }
+
+            }
+            camera.SendMessage("SetCar", newCars[activeCarIndex].carGO.gameObject);
         }
     }
 
@@ -242,27 +246,6 @@ public class GameRulesController : MonoBehaviour
         Time.timeScale = gameSpeed;
     }
 
-    void SelectCarToCamera(List<NeuralNetwork> newCars)
-    {
-        if (newCars.Count > 0)
-        {
-            if (!newCars[0].gameObject.activeInHierarchy)
-            {
-                Debug.Log("newCars length " + newCars.Count);
-                for (int i = 0; i < newCars.Count; i++)
-                {
-                    var car = newCars[i];
-                    if (car.gameObject.activeInHierarchy)
-                    {
-                        activeCarIndex = i;
-                    }
-                }
-
-            }
-            camera.SendMessage("SetCar", newCars[activeCarIndex].carGO.gameObject);
-        }
-    }
-
     void GenerateCars(List<NeuralNetwork> newCars)
     {
         int realCarNumber = newCars.Count > 0 ? newCars.Count : numCars;
@@ -311,6 +294,7 @@ public class GameRulesController : MonoBehaviour
             carComp.gameSpeed = gameSpeed;
 
             if ( i < newCars.Count) {
+                carComp.currentTrack = currentSpawnPoint;
                 carComp.parentLayers = newCars[i].neuralLayers;
                 carComp.wasLoaded = newCars[i].wasLoaded;
                 carComp.firstScore = newCars[i].firstScore;
@@ -320,7 +304,7 @@ public class GameRulesController : MonoBehaviour
                     carComp.carName = generations + "-" + i;
                 } else {
                     carComp.carName = newCars[i].carName;
-                    carComp.distanceByTrack = newCars[i].distanceByTrack;
+                    carComp.positionsByTrack = newCars[i].positionsByTrack;
                 }
             }
 
@@ -377,7 +361,7 @@ public class GameRulesController : MonoBehaviour
             car.firstScore = false;
             car.topScore = false;
             
-            float thisCarScore = car.CalculateTotalScore(highestTravelledDistByTrack);
+            float thisCarScore = car.CalculateTotalScore(wallPaths);
 
             if (thisCarScore > highestScore)
                 highestScore = thisCarScore;

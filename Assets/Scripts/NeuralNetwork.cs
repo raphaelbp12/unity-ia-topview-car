@@ -58,10 +58,10 @@ public class NeuralNetwork : MonoBehaviour
     public float meanVel = 50;
     public bool hasCrashedOnWall = false;
     public int ticksOnCrash = 5000;
-    public float score = 0;
+    public float score { get; private set; }
 
-    public List<float> distanceByTrack = new List<float>() {0, 0, 0, 0, 0};
-    int currentTrack = 0;
+    public List<Vector3> positionsByTrack = new List<Vector3>() { default, default, default, default, default };
+    public int currentTrack = 0;
 
     public bool wasLoaded = false;
     public bool firstScore = false;
@@ -373,11 +373,11 @@ public class NeuralNetwork : MonoBehaviour
         Debug.Log("setGameoverCalled " + reason);
         if (!gameover)
         {
-            if (distanceByTrack.Count < currentTrack + 1)
+            if (positionsByTrack.Count < currentTrack + 1)
             {
-                distanceByTrack.Add(distanceTravelled);
+                positionsByTrack.Add(gameObject.transform.position);
             } else {
-                distanceByTrack[currentTrack] = distanceTravelled;
+                positionsByTrack[currentTrack] = carGO.transform.position;
             }
             if (crashedOnWall)
             {
@@ -392,57 +392,42 @@ public class NeuralNetwork : MonoBehaviour
             UnityEngine.Object.Destroy(gameObject);
         }
     }
-
-    public float CalculateScore(float highestTravelledDist, float highestMeanVelInTicks, int currentTrackInput)
+    public int ComputeScore(Vector3 deathPoint, List<Vector3> pathPoints)
     {
-        currentTrack = currentTrackInput;
-        float normalizedTravelledDist = 1 - ((highestTravelledDist - distanceTravelled + 0.000001f) / highestTravelledDist);
+        float minDist = Mathf.Infinity;
+        int pointIndex = 0;
 
-        if (highestTravelledDist == distanceTravelled)
+        for (int i = 0; i < pathPoints.Count; i++)
         {
-            normalizedTravelledDist = 1.0f;
+            var point = pathPoints[i];
+            float dist = Vector3.Distance(deathPoint, point);
+
+            if (dist < minDist)
+            {
+                minDist = dist;
+                pointIndex = i;
+            }
         }
 
-        // float normalizedMeanVel = (highestMeanVelInTicks - meanVelInTicks + 0.000001f) / highestMeanVelInTicks;
-
-        // if (highestMeanVelInTicks == meanVelInTicks)
-        // {
-        //     normalizedMeanVel = 1.0f;
-        // }
-
-        //relativeGoalDistance = (highestGoalDistance - goalDistance + 0.001f) / highestGoalDistance;
-
-        float currentScore = normalizedTravelledDist;
+        int currentScore = pointIndex;
 
         if (ticksWithMinDistanceValid == 0)
         {
             currentScore = 0;
         }
 
-        //if (hasCrashedOnWall)
-        //{
-        //    currentScore = 0;
-        //}
-
-        //if (checkpointsReached > 0)
-        //{
-        //    currentScore = currentScore * checkpointsReached * 20;
-        //}
-
-        score = currentScore;
         return currentScore;
     }
 
-    public float CalculateTotalScore(List<float> highestTravelledDistByTrack) {
-        float scoreSum = 0f;
+    public float CalculateTotalScore(List<WallPath> wallPaths) {
+        int scoreSum = 0;
         int totalTrackWeight = 0;
 
-        for (int i = 0; i < highestTravelledDistByTrack.Count; i++)
+        for (int i = 0; i < wallPaths.Count; i++)
         {
-            float highestTravelledDist = highestTravelledDistByTrack[i];
-            float dist = distanceByTrack[i];
+            Vector3 positionByTrack = positionsByTrack[i];
 
-            float normalizedTravelledDist = 1 - ((highestTravelledDist - dist + 0.000001f) / highestTravelledDist);
+            int score = ComputeScore(positionByTrack, wallPaths[i].GetPoints());
 
             int trackWeight = 1;
 
@@ -453,19 +438,15 @@ public class NeuralNetwork : MonoBehaviour
                 trackWeight = 4;
             }
 
-            if (highestTravelledDist <= dist)
-            {
-                normalizedTravelledDist = 1.0f;
-            }
-            scoreSum += normalizedTravelledDist * trackWeight;
+            scoreSum += score * trackWeight;
             totalTrackWeight += trackWeight;
         }
 
         score = scoreSum/totalTrackWeight;
 
-        for (int i = 0; i < distanceByTrack.Count; i++)
+        for (int i = 0; i < positionsByTrack.Count; i++)
         {
-            distanceByTrack[i] = 0f;
+            positionsByTrack[i] = new Vector3();
         }
 
         return score;
