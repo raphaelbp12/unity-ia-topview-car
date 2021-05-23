@@ -370,7 +370,7 @@ public class NeuralNetwork : MonoBehaviour
 
     void setGameover(bool crashedOnWall, string reason)
     {
-        Debug.Log("setGameoverCalled " + reason);
+        //Debug.Log("setGameoverCalled " + reason);
         if (!gameover)
         {
             if (positionsByTrack.Count < currentTrack + 1)
@@ -392,7 +392,7 @@ public class NeuralNetwork : MonoBehaviour
             UnityEngine.Object.Destroy(gameObject);
         }
     }
-    public int ComputeScore(Vector3 deathPoint, List<Vector3> pathPoints)
+    public float ComputeScore(Vector3 deathPoint, List<Vector3> pathPoints)
     {
         float minDist = Mathf.Infinity;
         int pointIndex = 0;
@@ -416,18 +416,18 @@ public class NeuralNetwork : MonoBehaviour
             currentScore = 0;
         }
 
-        return currentScore;
+        return currentScore/pathPoints.Count;
     }
 
     public float CalculateTotalScore(List<WallPath> wallPaths) {
-        int scoreSum = 0;
+        float scoreSum = 0;
         int totalTrackWeight = 0;
 
         for (int i = 0; i < wallPaths.Count; i++)
         {
             Vector3 positionByTrack = positionsByTrack[i];
 
-            int score = ComputeScore(positionByTrack, wallPaths[i].GetPoints());
+            float score = ComputeScore(positionByTrack, wallPaths[i].GetPoints());
 
             int trackWeight = 1;
 
