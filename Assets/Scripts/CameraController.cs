@@ -10,12 +10,14 @@ public class CameraController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        if (car == null) return;
         offset = transform.position - car.transform.position;
     }
 
     // Update is called once per frame
     void LateUpdate()
     {
+        if (car == null) return;
         transform.position = car.transform.position + new Vector3(0, 30, 0);
     }
 
