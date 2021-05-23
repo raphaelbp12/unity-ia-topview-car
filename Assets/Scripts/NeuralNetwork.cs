@@ -182,11 +182,11 @@ public class NeuralNetwork : MonoBehaviour
         var front = Vector3.forward;
         var back = Vector3.back;
 
-        var deg15 = (Quaternion.Euler(0, -15, 0) * front).normalized;
-        var deg15mirrored = (Quaternion.Euler(0, 15, 0) * front).normalized;
+        var deg15 = (Quaternion.Euler(0, -30, 0) * front).normalized;
+        var deg15mirrored = (Quaternion.Euler(0, 30, 0) * front).normalized;
 
-        var deg30 = (Quaternion.Euler(0, -30, 0) * front).normalized;
-        var deg30mirrored = (Quaternion.Euler(0, 30, 0) * front).normalized;
+        var deg30 = (Quaternion.Euler(0, -75, 0) * front).normalized;
+        var deg30mirrored = (Quaternion.Euler(0, 75, 0) * front).normalized;
 
         result.Add(GetLaserDistToWall(maxLaserDistance, front));
         result.Add(GetLaserDistToWall(maxLaserDistance, back));
