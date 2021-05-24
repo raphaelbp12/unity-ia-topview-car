@@ -12,6 +12,8 @@ public class NeuralNetwork : MonoBehaviour
     public GameObject car;
     public GameObject carGO;
     public string carName = "";
+    public string motherCarName = "";
+    public string fatherCarName = "";
 
     Rigidbody _rb;
 
@@ -61,6 +63,8 @@ public class NeuralNetwork : MonoBehaviour
     public float score { get; private set; }
 
     public List<Vector3> positionsByTrack = new List<Vector3>() { default, default, default, default, default };
+
+    public List<float> scoresByTrack = new List<float>() { default, default, default, default, default };
     public int currentTrack = 0;
 
     public bool wasLoaded = false;
@@ -438,6 +442,8 @@ public class NeuralNetwork : MonoBehaviour
                 trackWeight = 4;
             }
 
+            scoresByTrack[i] = score;
+
             scoreSum += score * trackWeight;
             totalTrackWeight += trackWeight;
         }
@@ -475,6 +481,8 @@ public class NeuralNetwork : MonoBehaviour
         }
 
         other.carName = carName;
+        other.motherCarName = motherCarName;
+        other.fatherCarName = fatherCarName;
         other.wasLoaded = wasLoaded;
         other.firstScore = firstScore;
         other.topScore = topScore;
