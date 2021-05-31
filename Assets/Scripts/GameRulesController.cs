@@ -8,12 +8,14 @@ using UnityEngine.UI;
 using VehicleBehaviour;
 using Newtonsoft.Json;
 using Assets.Classes.DTOs;
+using System;
 
 public class GameRulesController : MonoBehaviour
 {
     // Reference to the Prefab. Drag a Prefab into this field in the Inspector.
 
-    public int populationID;
+    private int populationID = 1;
+    private PopulationDTO populationDTO = new PopulationDTO();
 
     public bool showDrawDebug = false;
     private int trackCount;
@@ -62,14 +64,15 @@ public class GameRulesController : MonoBehaviour
     private NeuralNetwork loadedNeuralNetwork;
     private List<NeuralNetwork> loadedNeuralNetworks = new List<NeuralNetwork>();
     private bool wasCarLoaded = false;
+    public Button savePopulationButton;
     public Button saveBestCarButton;
     public Button loadCarButton;
     private string pathToTheFile = "./cars/";
     public InputField carFileName;
-    //private List<string> existingCars = new List<string>();
+    private List<string> existingCars = new List<string>();
     // private List<string> existingCars = new List<string>() { "massa", "dia1", "dia2", "dia3", "diferente", "diferente2", "azulao" };
 
-    private List<string> existingCars = new List<string>() { "terraria", "terraria1", "terraria2", "unhasedentes", "unhasedentes1", "unhasedentes2", "soninho", "soninho1", "soninho2", "soninho3", "soninho4", "canhotinho", "canhotinho1", "canhotinho2", "canhotinho3" };
+    //private List<string> existingCars = new List<string>() { "terraria", "terraria1", "terraria2", "unhasedentes", "unhasedentes1", "unhasedentes2", "soninho", "soninho1", "soninho2", "soninho3", "soninho4", "canhotinho", "canhotinho1", "canhotinho2", "canhotinho3" };
 
     public int numberPersistentCars = 4;
 
@@ -83,11 +86,14 @@ public class GameRulesController : MonoBehaviour
         PopulationDTO populationDTO = new PopulationDTO();
         populationDTO.Name = "test123";
 
-        StartCoroutine(WebRequest.Post("http://localhost:5000/api/Populations", JsonConvert.SerializeObject(populationDTO), PopulationPostCallback));
+        //StartCoroutine(WebRequest.Post("http://localhost:5000/api/Populations", JsonConvert.SerializeObject(populationDTO), PopulationPostCallback));
         trackCount = spawnPoints.Count;
 
         Button saveBtn = saveBestCarButton.GetComponent<Button>();
-		saveBtn.onClick.AddListener(SaveBestCarOnClick);
+        saveBtn.onClick.AddListener(SaveBestCarOnClick);
+
+        Button savePopulationBtn = savePopulationButton.GetComponent<Button>();
+        savePopulationBtn.onClick.AddListener(SavePopulationOnClick);
 
         Button loadBtn = loadCarButton.GetComponent<Button>();
 		loadBtn.onClick.AddListener(LoadCarOnClick);
@@ -107,6 +113,7 @@ public class GameRulesController : MonoBehaviour
             highestTravelledDistByTrack.Add(0f);
         }
         Time.timeScale = gameSpeed;
+        GenerateCars(new List<NeuralNetwork>());
 
 
         for (int i = 0; i < trackCount; i++)
@@ -143,7 +150,7 @@ public class GameRulesController : MonoBehaviour
         }
         else
         {
-            if(populationID != 0) PrepareNextTrack();
+            PrepareNextTrack();
         }
     }
 
@@ -168,10 +175,17 @@ public class GameRulesController : MonoBehaviour
         }
     }
 
-    void SaveBestCarOnClick(){
-		Debug.Log ("You have clicked the button!");
-        SaveCar(bestCurrentCar);
-	}
+    void SaveBestCarOnClick()
+    {
+        Debug.Log("You have clicked the button!");
+        SaveJson.SaveCar(bestCurrentCar, pathToTheFile, carFileName);
+    }
+
+    void SavePopulationOnClick()
+    {
+        Debug.Log("You have clicked the SavePopulation button!");
+        SaveJson.Population(populationDTO, pathToTheFile);
+    }
 
     void LoadCarOnClick(){
         string carName = "car";
@@ -187,31 +201,6 @@ public class GameRulesController : MonoBehaviour
             LoadCar(path, carName);
         }
 	}
-
-    public void SaveCar(NeuralNetwork car)
-    {
-        string path = pathToTheFile + "car.txt";
-
-        if (carFileName.text != "")
-        {
-            path = pathToTheFile + carFileName.text + ".txt";
-        }
-
-        if (!File.Exists(path)) {
-            File.Create(path);
-        }
-
-        var json = File.ReadAllText(path);
-        var carsParsed = JsonConvert.DeserializeObject<List<List<List<float>>>>(json);
-        List<List<List<float>>> neuralLayerWeights = new List<List<List<float>>>() {};
-
-        foreach (Layer layer in car.neuralLayers)
-        {
-            neuralLayerWeights.Add(layer.GetWeights());
-        }
-
-        File.WriteAllText(path, JsonConvert.SerializeObject(neuralLayerWeights));
-    }
 
     private void PopulationPostCallback(string response)
     {
@@ -229,7 +218,8 @@ public class GameRulesController : MonoBehaviour
         var json = File.ReadAllText(path);
         var neuralLayerWeights = JsonConvert.DeserializeObject<List<List<List<float>>>>(json);
         NeuralNetwork carComp = new NeuralNetwork();
-        carComp.carName = carName;
+        Guid newUuid = Guid.NewGuid();
+        carComp.carName = newUuid;
 
         loadedNeuralNetwork = carComp;
         loadedNeuralNetwork.neuralLayers = carComp.Network(neuralLayerWeights);
@@ -322,15 +312,15 @@ public class GameRulesController : MonoBehaviour
                 carComp.motherCarName = newCars[i].motherCarName;
                 carComp.fatherCarName = newCars[i].fatherCarName;
 
-                if (newCars[i].carName != "") {
+                if (newCars[i].carName != null) {
                     carComp.carName = newCars[i].carName;
                     carComp.positionsByTrack = newCars[i].positionsByTrack;
                 }
             }
             
-            if (carComp.carName == "")
+            if (carComp.carName == null)
             {
-                carComp.carName = "P" + populationID + "-" + generations + "-" + i;
+                carComp.carName = Guid.NewGuid();
             }
 
             thisGenerationCars.Add(carComp);
@@ -395,37 +385,7 @@ public class GameRulesController : MonoBehaviour
         currentHighestScore = highestScore;
         scoreHistory.Add(currentHighestScore);
 
-        List<CarDTO> carDTOs = thisGenerationCars.Select(car =>
-        {
-            List<List<List<float>>> neuralLayerWeights = new List<List<List<float>>>() { };
-
-            foreach (Layer layer in car.neuralLayers)
-            {
-                neuralLayerWeights.Add(layer.GetWeights());
-            }
-
-            List<ScoreDTO> scores = car.scoresByTrack.Select((float value, int index) =>
-            {
-                return new ScoreDTO
-                {
-                    Value = value,
-                    TrackId = index
-                };
-            }).ToList();
-
-            scores.Add(new ScoreDTO { TrackId = -1, Value = car.score });
-
-            CarDTO carDTO = new CarDTO
-            {
-                Name = car.carName,
-                MotherName = car.motherCarName,
-                FatherName = car.fatherCarName,
-                Weights = JsonConvert.SerializeObject(neuralLayerWeights),
-                Scores = scores
-            };
-
-            return carDTO;
-        }).ToList();
+        List<CarDTO> carDTOs = ParseGenerationCards(thisGenerationCars);
 
         carsOrdered = thisGenerationCars.ToList().OrderByDescending(o => o.score).ToList();
 
@@ -435,7 +395,7 @@ public class GameRulesController : MonoBehaviour
         generationDTO.PopulationId = populationID;
         generationDTO.Cars = carDTOs;
 
-        StartCoroutine(WebRequest.Post("http://localhost:5000/api/Generations", JsonConvert.SerializeObject(generationDTO), GenerationPostCallback));
+        //StartCoroutine(WebRequest.Post("http://localhost:5000/api/Generations", JsonConvert.SerializeObject(generationDTO), GenerationPostCallback));
 
 
         //foreach (WheelVehicle car in thisGenerationCars)
@@ -500,6 +460,64 @@ public class GameRulesController : MonoBehaviour
         //{
         //    cars[i].
         //}
+    }
+
+    private List<CarDTO> ParseGenerationCards(List<NeuralNetwork> generationCards)
+    {
+
+        List<CarDTO> newCarsDTO = generationCards.Select(car =>
+        {
+            List<List<List<float>>> neuralLayerWeights = new List<List<List<float>>>() { };
+
+            foreach (Layer layer in car.neuralLayers)
+            {
+                neuralLayerWeights.Add(layer.GetWeights());
+            }
+
+            List<ScoreDTO> scores = car.scoresByTrack.Select((float value, int index) =>
+            {
+                return new ScoreDTO
+                {
+                    Value = value,
+                    TrackId = index
+                };
+            }).ToList();
+
+            scores.Add(new ScoreDTO { TrackId = -1, Value = car.score, Genereation = generations });
+
+            CarDTO carDTO = new CarDTO
+            {
+                Name = car.carName.ToString(),
+                MotherName = car.motherCarName.ToString(),
+                FatherName = car.fatherCarName.ToString(),
+                Weights = JsonConvert.SerializeObject(neuralLayerWeights),
+                Scores = scores
+            };
+
+            return carDTO;
+        }).ToList();
+
+        SaveCarsInPopulation(newCarsDTO);
+
+        return newCarsDTO;
+    }
+
+    private PopulationDTO SaveCarsInPopulation(List<CarDTO> newCarDTOs)
+    {
+        foreach(CarDTO newCarDTO in newCarDTOs)
+        {
+            foreach (CarDTO car in populationDTO.Cars)
+            {
+                if (car.Name == newCarDTO.Name)
+                {
+                    car.Scores.AddRange(newCarDTO.Scores);
+                    continue;
+                }
+            }
+            populationDTO.Cars.Add(newCarDTO);
+        }
+
+        return populationDTO;
     }
 
     List<NeuralNetwork> CrossOver(List<NeuralNetwork> carListProbabilities, int numChildren)
@@ -571,7 +589,6 @@ public class GameRulesController : MonoBehaviour
 
             childCar.motherCarName = carListProbabilities[carMotherIndex].carName;
             childCar.fatherCarName = carListProbabilities[carFatherIndex].carName;
-            childCar.carName = carListProbabilities[carMotherIndex].carName + "+" + carListProbabilities[carFatherIndex].carName;
             newCars.Add(childCar);
         }
 

@@ -11,9 +11,9 @@ public class NeuralNetwork : MonoBehaviour
     public GameObject modelPrefab;
     public GameObject car;
     public GameObject carGO;
-    public string carName = "";
-    public string motherCarName = "";
-    public string fatherCarName = "";
+    public Guid carName = Guid.NewGuid();
+    public Guid? motherCarName = null;
+    public Guid? fatherCarName = null;
 
     Rigidbody _rb;
 
@@ -64,7 +64,7 @@ public class NeuralNetwork : MonoBehaviour
 
     public List<Vector3> positionsByTrack = new List<Vector3>() { default, default, default, default, default };
 
-    public List<float> scoresByTrack = new List<float>() { default, default, default, default, default };
+    public List<float> scoresByTrack = new List<float>() { default, default, default, default, default, default, default };
     public int currentTrack = 0;
 
     public bool wasLoaded = false;
@@ -75,6 +75,7 @@ public class NeuralNetwork : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        scoresByTrack = new List<float>() { default, default, default, default, default, default, default };
         //goal = GameObject.FindGameObjectWithTag("Goal");
 
         GameObject car = Instantiate(modelPrefab, transform.position, Quaternion.identity);

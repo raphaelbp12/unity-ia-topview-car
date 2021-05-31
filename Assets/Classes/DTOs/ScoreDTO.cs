@@ -11,5 +11,6 @@ namespace Assets.Classes.DTOs
         public int Id { get; set; }
         public int TrackId { get; set; }
         public float Value { get; set; }
+        public int Genereation { get; set; }
     }
 }
