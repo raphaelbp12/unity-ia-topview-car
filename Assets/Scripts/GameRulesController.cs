@@ -479,7 +479,8 @@ public class GameRulesController : MonoBehaviour
                 return new ScoreDTO
                 {
                     Value = value,
-                    TrackId = index
+                    TrackId = index,
+                    Genereation = generations
                 };
             }).ToList();
 
