@@ -69,10 +69,10 @@ public class GameRulesController : MonoBehaviour
     public Button loadCarButton;
     private string pathToTheFile = "./cars/";
     public InputField carFileName;
-    private List<string> existingCars = new List<string>();
+    //private List<string> existingCars = new List<string>();
     // private List<string> existingCars = new List<string>() { "massa", "dia1", "dia2", "dia3", "diferente", "diferente2", "azulao" };
 
-    //private List<string> existingCars = new List<string>() { "terraria", "terraria1", "terraria2", "unhasedentes", "unhasedentes1", "unhasedentes2", "soninho", "soninho1", "soninho2", "soninho3", "soninho4", "canhotinho", "canhotinho1", "canhotinho2", "canhotinho3" };
+    private List<string> existingCars = new List<string>() { "terraria", "terraria1", "terraria2", "unhasedentes", "unhasedentes1", "unhasedentes2", "soninho", "soninho1", "soninho2", "soninho3", "soninho4", "canhotinho", "canhotinho1", "canhotinho2", "canhotinho3" };
 
     public int numberPersistentCars = 4;
 
