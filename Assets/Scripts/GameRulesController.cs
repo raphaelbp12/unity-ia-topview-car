@@ -20,6 +20,7 @@ public class GameRulesController : MonoBehaviour
     public bool showDrawDebug = false;
     private int trackCount;
     public int generations = 0;
+    public GameObject NeuralNetworkVisualizer;
     public GameObject myPrefab;
     public GameObject camera;
     public List<GameObject> spawnPoints;
@@ -60,7 +61,7 @@ public class GameRulesController : MonoBehaviour
     public int ticks = 0;
     public int ticksIntervalCalcCamera = 20;
 
-    private NeuralNetwork bestCurrentCar;
+    public NeuralNetwork bestCurrentCar;
     private NeuralNetwork loadedNeuralNetwork;
     private List<NeuralNetwork> loadedNeuralNetworks = new List<NeuralNetwork>();
     private bool wasCarLoaded = false;
@@ -96,7 +97,7 @@ public class GameRulesController : MonoBehaviour
         savePopulationBtn.onClick.AddListener(SavePopulationOnClick);
 
         Button loadBtn = loadCarButton.GetComponent<Button>();
-		loadBtn.onClick.AddListener(LoadCarOnClick);
+        loadBtn.onClick.AddListener(LoadCarOnClick);
 
         if (existingCars.Count > 0)
         {
@@ -118,7 +119,7 @@ public class GameRulesController : MonoBehaviour
 
         for (int i = 0; i < trackCount; i++)
         {
-            wallPaths.Add(movingWalls[i+1].wallPath);
+            wallPaths.Add(movingWalls[i + 1].wallPath);
         }
     }
 
@@ -172,6 +173,7 @@ public class GameRulesController : MonoBehaviour
 
             }
             camera.SendMessage("SetCar", newCars[activeCarIndex].carGO.gameObject);
+            NeuralNetworkVisualizer.SendMessage("SetCar", newCars[activeCarIndex]);
         }
     }
 
@@ -187,7 +189,8 @@ public class GameRulesController : MonoBehaviour
         SaveJson.Population(populationDTO, pathToTheFile);
     }
 
-    void LoadCarOnClick(){
+    void LoadCarOnClick()
+    {
         string carName = "car";
         string path = pathToTheFile + "car.txt";
 
@@ -197,10 +200,11 @@ public class GameRulesController : MonoBehaviour
             path = pathToTheFile + carName + ".txt";
         }
 
-        if (File.Exists(path)) {
+        if (File.Exists(path))
+        {
             LoadCar(path, carName);
         }
-	}
+    }
 
     private void PopulationPostCallback(string response)
     {
@@ -214,7 +218,8 @@ public class GameRulesController : MonoBehaviour
         GenerationDTO generationDTO = JsonConvert.DeserializeObject<GenerationDTO>(response);
     }
 
-    public void LoadCar(string path, string carName) {
+    public void LoadCar(string path, string carName)
+    {
         var json = File.ReadAllText(path);
         var neuralLayerWeights = JsonConvert.DeserializeObject<List<List<List<float>>>>(json);
         NeuralNetwork carComp = new NeuralNetwork();
@@ -240,11 +245,14 @@ public class GameRulesController : MonoBehaviour
 
         int nextCurrentSpawnPoint = currentSpawnPoint + 1;
 
-        if (nextCurrentSpawnPoint == spawnPoints.Count) {
+        if (nextCurrentSpawnPoint == spawnPoints.Count)
+        {
             generations += 1;
             currentSpawnPoint = 0;
             NaturalSelection();
-        } else {
+        }
+        else
+        {
             currentSpawnPoint = nextCurrentSpawnPoint;
             GenerateCars(thisGenerationCars);
         }
@@ -278,7 +286,7 @@ public class GameRulesController : MonoBehaviour
 
         if (wasCarLoaded && loadedNeuralNetworks.Count > 0)
         {
-            foreach(NeuralNetwork car in loadedNeuralNetworks)
+            foreach (NeuralNetwork car in loadedNeuralNetworks)
             {
                 NeuralNetwork carToAdd = car.DeepCopy();
                 carToAdd.wasLoaded = true;
@@ -303,7 +311,8 @@ public class GameRulesController : MonoBehaviour
             carComp = car.GetComponent<NeuralNetwork>();
             carComp.gameSpeed = gameSpeed;
 
-            if ( i < newCars.Count) {
+            if (i < newCars.Count)
+            {
                 carComp.currentTrack = currentSpawnPoint;
                 carComp.parentLayers = newCars[i].neuralLayers;
                 carComp.wasLoaded = newCars[i].wasLoaded;
@@ -312,12 +321,13 @@ public class GameRulesController : MonoBehaviour
                 carComp.motherCarName = newCars[i].motherCarName;
                 carComp.fatherCarName = newCars[i].fatherCarName;
 
-                if (newCars[i].carName != null) {
+                if (newCars[i].carName != null)
+                {
                     carComp.carName = newCars[i].carName;
                     carComp.positionsByTrack = newCars[i].positionsByTrack;
                 }
             }
-            
+
             if (carComp.carName == null)
             {
                 carComp.carName = Guid.NewGuid();
@@ -375,7 +385,7 @@ public class GameRulesController : MonoBehaviour
         {
             car.firstScore = false;
             car.topScore = false;
-            
+
             float thisCarScore = car.CalculateTotalScore(wallPaths);
 
             if (thisCarScore > highestScore)
@@ -413,7 +423,7 @@ public class GameRulesController : MonoBehaviour
             carListProbabilities.Add(carsOrdered[i]);
         }
 
-        for(int i = (numCars - 1); i > (numCars - numberOfParents - 1); i--)
+        for (int i = (numCars - 1); i > (numCars - numberOfParents - 1); i--)
         {
             carListProbabilities.Add(carsOrdered[i]);
         }
@@ -505,7 +515,7 @@ public class GameRulesController : MonoBehaviour
 
     private PopulationDTO SaveCarsInPopulation(List<CarDTO> newCarDTOs)
     {
-        foreach(CarDTO newCarDTO in newCarDTOs)
+        foreach (CarDTO newCarDTO in newCarDTOs)
         {
             foreach (CarDTO car in populationDTO.Cars)
             {
@@ -538,7 +548,7 @@ public class GameRulesController : MonoBehaviour
 
             List<Neuron> resultGenome = motherGenome.Take(crossOverPoint).Concat(fatherGenome.Skip(crossOverPoint)).ToList();
             List<Neuron> childrenGenome = new List<Neuron>();
-            foreach(Neuron neuron in resultGenome)
+            foreach (Neuron neuron in resultGenome)
             {
                 childrenGenome.Add(neuron.DeepCopy());
             }
@@ -566,7 +576,7 @@ public class GameRulesController : MonoBehaviour
 
             NeuralNetwork baseCar = carListProbabilities[carMotherIndex];
 
-            foreach(Layer layer in baseCar.neuralLayers)
+            foreach (Layer layer in baseCar.neuralLayers)
             {
                 childCar.neuralLayers.Add(layer.DeepCopy());
             }
@@ -579,7 +589,7 @@ public class GameRulesController : MonoBehaviour
 
                 if (previousLayerNeurons.Count > 0)
                 {
-                    for(int k = 0; k < baseCar.neuralLayers[j].neurons.Count; k++)
+                    for (int k = 0; k < baseCar.neuralLayers[j].neurons.Count; k++)
                     {
                         childCar.neuralLayers[j].neurons[k].neuronsPreviousLayer = previousLayerNeurons;
                     }
