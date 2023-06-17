@@ -61,9 +61,9 @@ public class NeuralNetworkVisualizer : MonoBehaviour
                         lineRenderer.color = Color.blue;
 
                         // Set line thickness based on weight (you could also set color)
-                        if (nextNeuronIndex < nextNeuron.weights.Count)
+                        if (neuronIndex < nextNeuron.weights.Count)
                         {
-                            float weight = nextNeuron.weights[nextNeuronIndex];
+                            float weight = nextNeuron.weights[neuronIndex];
 
                             if (weight < 0) lineRenderer.color = Color.red;
 

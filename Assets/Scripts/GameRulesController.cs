@@ -70,16 +70,19 @@ public class GameRulesController : MonoBehaviour
     public Button loadCarButton;
     private string pathToTheFile = "./cars/";
     public InputField carFileName;
-    //private List<string> existingCars = new List<string>();
-    // private List<string> existingCars = new List<string>() { "massa", "dia1", "dia2", "dia3", "diferente", "diferente2", "azulao" };
+    private List<string> existingCars = new List<string>();
+    //private List<string> existingCars = new List<string>() { "terraria", "rapidao2" };
 
-    private List<string> existingCars = new List<string>() { "terraria", "terraria1", "terraria2", "unhasedentes", "unhasedentes1", "unhasedentes2", "soninho", "soninho1", "soninho2", "soninho3", "soninho4", "canhotinho", "canhotinho1", "canhotinho2", "canhotinho3" };
+    //private List<string> existingCars = new List<string>() { "terraria", "terraria1", "terraria2", "unhasedentes", "unhasedentes1", "unhasedentes2", "soninho", "soninho1", "soninho2", "soninho3", "soninho4", "canhotinho", "canhotinho1", "canhotinho2", "canhotinho3" };
 
     public int numberPersistentCars = 4;
 
     [SerializeField] List<WallMover> movingWalls;
 
     private List<WallPath> wallPaths = new List<WallPath>();
+
+    private List<float> highestScores = new List<float>();
+    private List<float> averageScores = new List<float>();
 
     // This script will simply instantiate the Prefab when the game starts.
     void Start()
@@ -113,6 +116,8 @@ public class GameRulesController : MonoBehaviour
         {
             highestTravelledDistByTrack.Add(0f);
         }
+        //Time.fixedDeltaTime = 0.01f;
+        //Time.timeScale = 4;
         Time.timeScale = gameSpeed;
         GenerateCars(new List<NeuralNetwork>());
 
@@ -398,6 +403,19 @@ public class GameRulesController : MonoBehaviour
         List<CarDTO> carDTOs = ParseGenerationCards(thisGenerationCars);
 
         carsOrdered = thisGenerationCars.ToList().OrderByDescending(o => o.score).ToList();
+
+        highestScores.Add(carsOrdered[0].score);
+        SaveJson.SaveScores(highestScores, pathToTheFile);
+
+        float totalScore = 0f;
+
+        foreach (var car in carsOrdered)
+        {
+            totalScore += car.score;
+        }
+
+        averageScores.Add(totalScore/carsOrdered.Count);
+        SaveJson.SaveScores(averageScores, pathToTheFile, "averageScores.txt");
 
         bestCurrentCar = carsOrdered[0].DeepCopy();
 

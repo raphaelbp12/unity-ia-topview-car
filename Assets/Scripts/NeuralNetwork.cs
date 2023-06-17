@@ -312,8 +312,8 @@ public class NeuralNetwork : MonoBehaviour
 
                 randomSteering = randomSteering * 1;
 
-                carGO.GetComponent<CinematicUnicycleController>().linearVelocity = randomThrottle;
-                carGO.GetComponent<CinematicUnicycleController>().angularVelocity = randomSteering;
+                carGO.GetComponent<CinematicUnicycleController>().linearVelocity = randomThrottle * 10;
+                carGO.GetComponent<CinematicUnicycleController>().angularVelocity = randomSteering * 10;
 
                 //Debug.Log("randomThrottle " + randomThrottle + " randomSteering " + randomSteering);
             }

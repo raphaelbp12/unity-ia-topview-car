@@ -47,7 +47,7 @@ public class WallMover : MonoBehaviour
         float theta = ((float)Math.Atan2(direction.normalized.x, direction.normalized.z) * 180 / (float)Math.PI);
 
         transform.rotation = Quaternion.Euler(1, theta, 1);
-        transform.position = transform.position + speed * (direction.normalized);
+        transform.position = transform.position + speed * (direction.normalized) * 10;
     }
 
     private Vector3 GetCurrentWaypoint()

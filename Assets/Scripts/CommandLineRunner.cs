@@ -6,6 +6,7 @@ public class CommandLineRunner : MonoBehaviour
 {
     public static void StartGame()
     {
+        Time.fixedDeltaTime = 0.005f;
         // Set the desired time scale (1 for normal speed)
         Time.timeScale = 1;
 

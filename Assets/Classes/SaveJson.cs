@@ -54,5 +54,18 @@ namespace Assets.Classes
 
             File.WriteAllText(path, JsonConvert.SerializeObject(neuralLayerWeights));
         }
+        public static void SaveScores(List<float> scores, string pathToTheFile, string fileName = "scores.txt")
+        {
+            string path = pathToTheFile + fileName;
+
+            // Create the file if it doesn't exist
+            if (!File.Exists(path))
+            {
+                File.Create(path).Close();
+            }
+
+            // Write the scores to the file
+            File.WriteAllText(path, JsonConvert.SerializeObject(scores));
+        }
     }
 }
