@@ -11363,7 +11363,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca92a35aa277b0447bd0b2fe2b245e90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  showDrawDebug: 0
+  showDrawDebug: 1
   generations: 0
   NeuralNetworkVisualizer: {fileID: 1486859436}
   myPrefab: {fileID: 8359733694891531329, guid: 42683dda80adf3f41a5da9911756061d,
@@ -11383,7 +11383,7 @@ MonoBehaviour:
   remainingCarText: {fileID: 1003187577}
   gameSpeedSlider: {fileID: 479332790}
   gameSpeedText: {fileID: 1046456796}
-  numCars: 200
+  numCars: 20
   carsOrdered: []
   thisGenerationCars: []
   highestTravelledDist: 0
